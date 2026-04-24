@@ -1,0 +1,3994 @@
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    :root {
+        /* Color Palette */
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --success-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+
+        /* Light Mode (Default) */
+        --bg-primary: #f3f4f6;
+        --bg-secondary: #ffffff;
+        --bg-tertiary: #f9fafb;
+        --bg-hover: rgba(0, 0, 0, 0.05);
+        --bg-active: rgba(102, 126, 234, 0.1);
+
+        --text-primary: #111827;
+        --text-secondary: #6b7280;
+        --text-muted: #9ca3af;
+
+        --border-color: rgba(0, 0, 0, 0.08);
+        --divider-color: rgba(0, 0, 0, 0.05);
+
+        /* Sidebar */
+        --sidebar-width: 280px;
+        --sidebar-collapsed-width: 80px;
+
+        /* Elevation */
+        --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.15);
+        --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.2);
+        --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.3);
+
+        /* Transitions */
+        --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+        --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+        --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    [data-theme="dark"] {
+        /* Dark Mode (Original) */
+        --bg-primary: #0f1419;
+        --bg-secondary: #1a1f2e;
+        --bg-tertiary: #242b3d;
+        --bg-hover: rgba(255, 255, 255, 0.05);
+        --bg-active: rgba(102, 126, 234, 0.1);
+
+        --text-primary: #ffffff;
+        --text-secondary: #9ca3af;
+        --text-muted: #6b7280;
+
+        --border-color: rgba(255, 255, 255, 0.08);
+        --divider-color: rgba(255, 255, 255, 0.05);
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        line-height: 1.6;
+        overflow-x: hidden;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: var(--sidebar-width);
+        height: 100vh;
+        background: var(--bg-secondary);
+        border-right: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+        transition: all var(--transition-base);
+        z-index: 1000;
+        overflow: visible;
+        /* Allow popups to be seen */
+    }
+
+    .sidebar.collapsed {
+        width: var(--sidebar-collapsed-width);
+    }
+
+    .sidebar.collapsed .logo-text,
+    .sidebar.collapsed .logo-subtitle,
+    .sidebar.collapsed .nav-text,
+    .sidebar.collapsed .nav-badge,
+    .sidebar.collapsed .nav-section-label {
+        display: none;
+    }
+
+    .sidebar.collapsed .nav-item {
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .sidebar.collapsed .logo {
+        justify-content: center;
+    }
+
+    .sidebar.collapsed .logo-icon {
+        margin-right: 0;
+    }
+
+    .sidebar::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 200px;
+        background: var(--primary-gradient);
+        opacity: 0.03;
+        pointer-events: none;
+    }
+
+    /* Sidebar Header */
+    .sidebar-header {
+        padding: 24px 20px;
+        border-bottom: 1px solid var(--divider-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        z-index: 1;
+        transition: all var(--transition-base);
+    }
+
+    .sidebar.collapsed .sidebar-header {
+        flex-direction: column;
+        gap: 12px;
+        padding: 20px 0;
+    }
+
+    .sidebar.collapsed .logo {
+        flex: 0;
+    }
+
+    .sidebar.collapsed .mobile-menu-toggle {
+        width: 100%;
+        background: transparent;
+        color: var(--text-secondary);
+        justify-content: center;
+        border: none;
+    }
+
+    .sidebar.collapsed .user-info,
+    .sidebar.collapsed .user-menu-toggle {
+        display: none;
+    }
+
+    .sidebar.collapsed .sidebar-footer {
+        padding: 20px 0;
+        justify-content: center;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
+    }
+
+    .logo-icon {
+        width: 40px;
+        height: 40px;
+        background: var(--bg-tertiary);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .logo-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .logo-text {
+        font-size: 20px;
+        font-weight: 700;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .logo-subtitle {
+        font-size: 9px;
+        color: var(--text-muted);
+        font-weight: 500;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        margin-top: 2px;
+    }
+
+    .mobile-menu-toggle {
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 8px;
+        display: block;
+        /* Make visible */
+        transition: all var(--transition-fast);
+    }
+
+    .mobile-menu-toggle:hover {
+        background: var(--bg-hover);
+        color: var(--text-primary);
+    }
+
+    /* Sidebar Navigation */
+    .sidebar-nav {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 16px 12px;
+        scrollbar-width: thin;
+        scrollbar-color: var(--bg-tertiary) transparent;
+    }
+
+    .sidebar-nav::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .sidebar-nav::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .sidebar-nav::-webkit-scrollbar-thumb {
+        background: var(--bg-tertiary);
+        border-radius: 3px;
+    }
+
+    .sidebar-nav::-webkit-scrollbar-thumb:hover {
+        background: var(--bg-hover);
+    }
+
+    .nav-section {
+        margin-bottom: 24px;
+    }
+
+    .nav-section-label {
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 0 12px 8px 12px;
+        display: block;
+    }
+
+    .nav-item {
+        margin-bottom: 4px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        color: var(--text-secondary);
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+    }
+
+    .nav-item:hover {
+        background: var(--bg-hover);
+        color: var(--text-primary);
+    }
+
+    .nav-item.active {
+        background: var(--bg-active);
+        color: var(--text-primary);
+        border-left: 3px solid #667eea;
+    }
+
+    .nav-icon {
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .nav-text {
+        flex: 1;
+        font-size: 14px;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .sidebar-theme-toggle {
+        margin: 0 16px 16px;
+        padding: 12px;
+        display: flex;
+        align-items: center;
+        border-radius: 12px;
+        /* Smooth corners */
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        border: 1px solid var(--border-color);
+        background: var(--bg-primary);
+        /* Stand out slightly */
+    }
+
+    .sidebar-theme-toggle:hover {
+        background: var(--bg-hover);
+        color: var(--text-primary);
+        border-color: var(--text-secondary);
+        /* Highlight border on hover */
+    }
+
+    .sidebar.collapsed .sidebar-theme-toggle {
+        justify-content: center;
+        padding: 12px;
+        margin: 0 12px 16px;
+        /* Adjust margin for collapsed */
+    }
+
+    .sidebar.collapsed .sidebar-theme-toggle .nav-text {
+        display: none;
+    }
+
+    /* Rotate animation for icon */
+    .rotate-icon {
+        animation: rotate 0.5s ease-in-out;
+    }
+
+    @keyframes rotate {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .nav-badge {
+        background: var(--primary-gradient);
+        color: white;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 12px;
+        min-width: 24px;
+        text-align: center;
+    }
+
+    /* Sidebar Footer */
+    .sidebar-footer {
+        padding: 16px;
+        border-top: 1px solid var(--divider-color);
+        position: relative;
+        z-index: 1;
+    }
+
+    .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: var(--bg-hover);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+    }
+
+    .user-profile:hover {
+        background: var(--bg-tertiary);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--primary-gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: 700;
+        color: white;
+        flex-shrink: 0;
+    }
+
+    .user-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .user-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .user-role {
+        font-size: 12px;
+        color: var(--text-secondary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .user-menu-toggle {
+        width: 24px;
+        height: 24px;
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        flex-shrink: 0;
+    }
+
+    .user-menu-toggle:hover {
+        color: var(--text-primary);
+        transform: rotate(180deg);
+    }
+
+    /* ===== MAIN */
+    /* Main Content */
+    .main-content {
+        margin-left: var(--sidebar-width);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        transition: all var(--transition-base);
+    }
+
+    .main-content.collapsed {
+        margin-left: var(--sidebar-collapsed-width);
+    }
+
+    /* Top Bar */
+    .top-bar {
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border-color);
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        backdrop-filter: blur(10px);
+    }
+
+    .top-bar-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .mobile-menu-toggle {
+        display: flex;
+        /* Make visible and align center */
+        background: var(--bg-hover);
+        border: 1px solid var(--border-color);
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: var(--text-secondary);
+        transition: all var(--transition-fast);
+    }
+
+    .mobile-menu-toggle:hover {
+        background: var(--bg-tertiary);
+        color: var(--text-primary);
+    }
+
+    .page-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .top-bar-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .icon-button {
+        position: relative;
+        background: var(--bg-hover);
+        border: 1px solid var(--border-color);
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: var(--text-secondary);
+        transition: all var(--transition-fast);
+    }
+
+    .icon-button:hover {
+        background: var(--bg-tertiary);
+        color: var(--text-primary);
+        transform: translateY(-2px);
+    }
+
+    .notification-dot {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 8px;
+        height: 8px;
+        background: #ef4444;
+        border-radius: 50%;
+        border: 2px solid var(--bg-secondary);
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.5;
+        }
+    }
+
+    /* Content Wrapper */
+    .content-wrapper {
+        flex: 1;
+        padding: 32px 24px;
+        background: var(--bg-primary);
+    }
+
+    .page-content {
+        display: none;
+    }
+
+    .page-content.active {
+        display: block;
+        animation: fadeIn var(--transition-base);
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 24px;
+        margin-bottom: 32px;
+    }
+
+    .stat-card {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 24px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        transition: all var(--transition-fast);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--primary-gradient);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform var(--transition-base);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+        border-color: rgba(102, 126, 234, 0.3);
+    }
+
+    .stat-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        flex-shrink: 0;
+        box-shadow: var(--shadow-md);
+    }
+
+    .stat-info {
+        flex: 1;
+    }
+
+    .stat-info h3 {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+    }
+
+    .stat-number {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 4px;
+    }
+
+    .stat-change {
+        font-size: 12px;
+        font-weight: 500;
+        padding: 4px 8px;
+        border-radius: 6px;
+        display: inline-block;
+    }
+
+    .stat-change.positive {
+        background: rgba(67, 233, 123, 0.15);
+        color: #43e97b;
+    }
+
+    .stat-change.negative {
+        background: rgba(239, 68, 68, 0.15);
+        color: #ef4444;
+    }
+
+    .stat-change.neutral {
+        background: rgba(74, 172, 254, 0.15);
+        color: #4facfe;
+    }
+
+    /* Content Grid */
+    .content-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 24px;
+    }
+
+    .content-card {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 24px;
+        transition: all var(--transition-fast);
+    }
+
+    .content-card:hover {
+        border-color: rgba(102, 126, 234, 0.2);
+        box-shadow: var(--shadow-md);
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--divider-color);
+    }
+
+    .card-header h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .btn-text {
+        background: none;
+        border: none;
+        color: #667eea;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+    }
+
+    .btn-text:hover {
+        color: #764ba2;
+        text-decoration: underline;
+    }
+
+    /* Activity List */
+    .activity-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .activity-item {
+        display: flex;
+        gap: 12px;
+        padding: 12px;
+        background: var(--bg-hover);
+        border-radius: 10px;
+        transition: all var(--transition-fast);
+    }
+
+    .activity-item:hover {
+        background: var(--bg-tertiary);
+        transform: translateX(4px);
+    }
+
+    .activity-icon {
+        width: 36px;
+        height: 36px;
+        background: var(--primary-gradient);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        flex-shrink: 0;
+    }
+
+    .activity-content {
+        flex: 1;
+    }
+
+    .activity-content p {
+        font-size: 14px;
+        color: var(--text-primary);
+        margin-bottom: 4px;
+    }
+
+    .activity-content strong {
+        color: #667eea;
+    }
+
+    .activity-time {
+        font-size: 12px;
+        color: var(--text-muted);
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .action-btn {
+        background: var(--bg-hover);
+        border: 1px solid var(--border-color);
+        padding: 16px;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        color: var(--text-secondary);
+        transition: all var(--transition-fast);
+    }
+
+    .action-btn:hover {
+        background: var(--bg-tertiary);
+        border-color: #667eea;
+        color: var(--text-primary);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .action-btn svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .action-btn span {
+        font-size: 13px;
+        font-weight: 500;
+        text-align: center;
+    }
+
+    /* ===== DATA KARYAWAN PAGE REDESIGN ===== */
+
+    /* Karyawan Header */
+    .karyawan-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+    }
+
+    .karyawan-title-section {
+        flex: 1;
+    }
+
+    .karyawan-title {
+        font-size: 32px;
+        font-weight: 700;
+        color: #ef4444;
+        margin-bottom: 8px;
+    }
+
+    .karyawan-subtitle {
+        font-size: 14px;
+        color: var(--text-secondary);
+    }
+
+    .karyawan-export-buttons {
+        display: flex;
+        gap: 12px;
+    }
+
+    .btn-export {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+    }
+
+    .btn-export.csv {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-export.csv:hover {
+        background: #dc2626;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-export.excel {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-export.excel:hover {
+        background: #dc2626;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* Statistics Cards */
+    .karyawan-stats {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .karyawan-stat-card {
+        background: #fef2f2;
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        transition: all var(--transition-fast);
+    }
+
+    .karyawan-stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .k karyawan-stat-card.total {
+        background: #f3f4f6;
+    }
+
+    .karyawan-stat-card.male {
+        background: #fef3c7;
+    }
+
+    .karyawan-stat-card.female {
+        background: #fce7f3;
+    }
+
+    .karyawan-stat-card.dept {
+        background: #dbeafe;
+    }
+
+    .karyawan-stat-card.biro {
+        background: #fce7f3;
+    }
+
+    .stat-icon-large {
+        width: 56px;
+        height: 56px;
+        background: white;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .stat-icon-large svg {
+        color: #6b7280;
+    }
+
+    .stat-emoji {
+        font-size: 36px;
+        line-height: 1;
+    }
+
+    .stat-info-large {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .stat-number-large {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1f2937;
+        line-height: 1.2;
+    }
+
+    .stat-label-large {
+        font-size: 11px;
+        font-weight: 600;
+        color: #6b7280;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        margin-top: 4px;
+    }
+
+    /* Search Controls */
+    .karyawan-controls {
+        margin-bottom: 16px;
+    }
+
+    .karyawan-search {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 12px 16px;
+        width: 100%;
+    }
+
+    .karyawan-search svg {
+        color: #9ca3af;
+        flex-shrink: 0;
+    }
+
+    .karyawan-search input {
+        flex: 1;
+        background: none;
+        border: none;
+        outline: none;
+        font-size: 14px;
+        color: #1f2937;
+    }
+
+    .karyawan-search input::placeholder {
+        color: #9ca3af;
+    }
+
+    /* Filters */
+    .karyawan-filters {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    .filter-select {
+        flex: 1;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 14px;
+        color: #1f2937;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+    }
+
+    .filter-select:hover {
+        border-color: #d1d5db;
+    }
+
+    .filter-select:focus {
+        outline: none;
+        border-color: #ef4444;
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    }
+
+    .btn-reset-filter {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #ef4444;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all var(--transition-fast);
+    }
+
+    .btn-reset-filter:hover {
+        background: #dc2626;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* Karyawan Table */
+    .karyawan-table-container {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .karyawan-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .karyawan-table thead {
+        background: #fce7f3;
+    }
+
+    .karyawan-table thead th {
+        padding: 16px;
+        text-align: left;
+        font-size: 12px;
+        font-weight: 700;
+        color: #831843;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #fbcfe8;
+    }
+
+    .karyawan-table tbody tr {
+        border-bottom: 1px solid #f3f4f6;
+        transition: all var(--transition-fast);
+    }
+
+    .karyawan-table tbody tr:hover {
+        background: #fef2f2;
+    }
+
+    .karyawan-table tbody td {
+        padding: 16px;
+        font-size: 13px;
+        color: #374151;
+    }
+
+    .karyawan-table tbody td:first-child {
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    /* Page Header */
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .page-header h2 {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .page-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    /* Search Box */
+    .search-box {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 10px 16px;
+        transition: all var(--transition-fast);
+    }
+
+    .search-box:focus-within {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .search-box svg {
+        color: var(--text-secondary);
+        flex-shrink: 0;
+    }
+
+    .search-box input {
+        background: none;
+        border: none;
+        outline: none;
+        color: var(--text-primary);
+        font-size: 14px;
+        width: 200px;
+    }
+
+    .search-box input::placeholder {
+        color: var(--text-muted);
+    }
+
+    /* Primary Button */
+    .btn-primary {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--primary-gradient);
+        border: none;
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-primary:active {
+        transform: translateY(0);
+    }
+
+
+    /* Data Table Container */
+    .data-table-container {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+
+    #karyawan-table-wrapper,
+    #magang-table-wrapper {
+        overflow-x: auto;
+        overflow-y: auto;
+        max-height: 600px;
+        /* Limit table height for vertical scrolling */
+    }
+
+    /* Custom scrollbar for table - Horizontal */
+    #karyawan-table-wrapper::-webkit-scrollbar,
+    #magang-table-wrapper::-webkit-scrollbar {
+        height: 8px;
+        width: 8px;
+        /* For vertical scrollbar */
+    }
+
+    #karyawan-table-wrapper::-webkit-scrollbar-track,
+    #magang-table-wrapper::-webkit-scrollbar-track {
+        background: var(--bg-tertiary);
+        border-radius: 4px;
+    }
+
+    #karyawan-table-wrapper::-webkit-scrollbar-thumb,
+    #magang-table-wrapper::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 4px;
+    }
+
+    #karyawan-table-wrapper::-webkit-scrollbar-thumb:hover,
+    #magang-table-wrapper::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    }
+
+    /* For Firefox */
+    #karyawan-table-wrapper,
+    #magang-table-wrapper {
+        scrollbar-width: thin;
+        scrollbar-color: #667eea var(--bg-tertiary);
+    }
+
+
+
+    .loading-state {
+        padding: 60px 20px;
+        text-align: center;
+        color: var(--text-secondary);
+    }
+
+    .loading-state p {
+        font-size: 14px;
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    /* Data Table */
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .data-table thead {
+        background: var(--bg-tertiary);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .data-table thead th {
+        padding: 16px;
+        text-align: center;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: sticky;
+        top: 0;
+        background: var(--bg-tertiary);
+        z-index: 10;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .data-table tbody tr {
+        border-bottom: 1px solid var(--divider-color);
+        transition: all var(--transition-fast);
+    }
+
+    .data-table tbody tr:hover {
+        background: var(--bg-hover);
+    }
+
+    .data-table tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    .data-table tbody td {
+        padding: 16px;
+        font-size: 14px;
+        color: var(--text-primary);
+        white-space: nowrap;
+        text-align: center;
+    }
+
+    .data-table tbody td:first-child {
+        font-weight: 500;
+    }
+
+    /* Row with REKOMENDASI - Yellow Highlight */
+    .data-table tbody tr.row-has-rekomendasi {
+        background-color: #fef3c7;
+        /* Light yellow */
+    }
+
+    [data-theme="dark"] .data-table tbody tr.row-has-rekomendasi {
+        background-color: #713f12;
+        /* Dark mode yellow */
+    }
+
+    .data-table tbody tr.row-has-rekomendasi:hover {
+        background-color: #fde68a;
+        /* Darker yellow on hover */
+    }
+
+    [data-theme="dark"] .data-table tbody tr.row-has-rekomendasi:hover {
+        background-color: #854d0e;
+        /* Dark mode darker yellow on hover */
+    }
+
+    /* Table Actions */
+    .table-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-icon {
+        background: var(--bg-hover);
+        border: 1px solid var(--border-color);
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: var(--text-secondary);
+        transition: all var(--transition-fast);
+    }
+
+    .btn-icon:hover {
+        background: var(--bg-tertiary);
+        color: var(--text-primary);
+    }
+
+    .btn-icon.edit:hover {
+        border-color: #4facfe;
+        color: #4facfe;
+    }
+
+    .btn-icon.delete:hover {
+        border-color: #ef4444;
+        color: #ef4444;
+    }
+
+    /* Status Dropdown */
+    .status-dropdown {
+        padding: 8px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        min-width: 180px;
+        transition: all var(--transition-fast);
+        outline: none;
+    }
+
+    .status-dropdown:hover {
+        border-color: #667eea;
+        background: var(--bg-hover);
+    }
+
+    .status-dropdown:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .status-dropdown:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: var(--bg-tertiary);
+    }
+
+    .status-dropdown option {
+        padding: 8px;
+        /* Remove background and color to show native dropdown */
+    }
+
+    /* Status Color Classes */
+    .status-dropdown.status-sudah-diteruskan {
+        background-color: #d1fae5;
+        color: #065f46;
+        border-color: #6ee7b7;
+        font-weight: 600;
+    }
+
+    .status-dropdown.status-sudah-dibuatkan-sb {
+        background-color: #dbeafe;
+        color: #1e40af;
+        border-color: #93c5fd;
+        font-weight: 600;
+    }
+
+    .status-dropdown.status-belum-dibuatkan-sb {
+        background-color: #fecdd3;
+        color: #9f1239;
+        border-color: #fda4af;
+        font-weight: 600;
+    }
+
+    .status-dropdown.status-ditolak {
+        background-color: #991b1b;
+        color: #ffffff;
+        border-color: #7f1d1d;
+        font-weight: 700;
+    }
+
+    /* Kehadiran Dropdown Styling */
+    .kehadiran-dropdown {
+        padding: 8px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        min-width: 150px;
+        transition: all var(--transition-fast);
+        outline: none;
+    }
+
+    .kehadiran-dropdown:hover {
+        border-color: #667eea;
+        background: var(--bg-hover);
+    }
+
+    .kehadiran-dropdown:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .kehadiran-dropdown:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: var(--bg-tertiary);
+    }
+
+    .kehadiran-dropdown.kehadiran-hadir {
+        background-color: #d1fae5;
+        color: #065f46;
+        border-color: #6ee7b7;
+        font-weight: 600;
+    }
+
+    .kehadiran-dropdown.kehadiran-tidak-hadir {
+        background-color: #fecdd3;
+        color: #9f1239;
+        border-color: #fda4af;
+        font-weight: 600;
+    }
+
+    /* Ensure empty/default dropdown is visible */
+    .status-dropdown:not([class*="status-"]) {
+        background-color: var(--bg-secondary);
+        color: var(--text-primary);
+    }
+
+    /* Dark mode adjustments */
+    [data-theme="dark"] .status-dropdown.status-sudah-diteruskan {
+        background-color: #064e3b;
+        color: #a7f3d0;
+        border-color: #10b981;
+    }
+
+    [data-theme="dark"] .status-dropdown.status-sudah-dibuatkan-sb {
+        background-color: #1e3a8a;
+        color: #bfdbfe;
+        border-color: #3b82f6;
+    }
+
+    [data-theme="dark"] .status-dropdown.status-belum-dibuatkan-sb {
+        background-color: #881337;
+        color: #fecdd3;
+        border-color: #be123c;
+    }
+
+    [data-theme="dark"] .status-dropdown.status-ditolak {
+        background-color: #7f1d1d;
+        color: #ffffff;
+        border-color: #991b1b;
+    }
+
+    /* Modal */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        animation: fadeIn 0.2s ease-out;
+    }
+
+    .modal {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        width: 90%;
+        max-width: 600px;
+        max-height: 90vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        animation: slideUp 0.3s ease-out;
+        box-shadow: var(--shadow-xl);
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .modal-header {
+        padding: 24px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .modal-header h3 {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .modal-close {
+        background: var(--bg-hover);
+        border: 1px solid var(--border-color);
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: var(--text-secondary);
+        transition: all var(--transition-fast);
+    }
+
+    .modal-close:hover {
+        background: var(--bg-tertiary);
+        color: var(--text-primary);
+    }
+
+    .modal-body {
+        padding: 24px;
+        overflow-y: auto;
+        flex: 1;
+        scrollbar-width: thin;
+        scrollbar-color: var(--text-muted) var(--bg-secondary);
+    }
+
+    .modal-body::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .modal-body::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .modal-body::-webkit-scrollbar-thumb {
+        background-color: var(--border-color);
+        border-radius: 3px;
+    }
+
+    .modal-body::-webkit-scrollbar-thumb:hover {
+        background-color: var(--text-secondary);
+    }
+
+    .modal-footer {
+        padding: 24px;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+
+    /* Form Elements */
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+    }
+
+    .form-group label .required {
+        color: #ef4444;
+    }
+
+    .form-control {
+        width: 100%;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-size: 14px;
+        color: var(--text-primary);
+        transition: all var(--transition-fast);
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-control::placeholder {
+        color: var(--text-muted);
+    }
+
+    select.form-control {
+        cursor: pointer;
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 80px;
+    }
+
+    /* Buttons */
+    .btn-secondary {
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        font-size: 14px;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+    }
+
+    .btn-secondary:hover {
+        background: var(--bg-hover);
+    }
+
+    .btn-danger {
+        background: #ef4444;
+        border: none;
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+    }
+
+    .btn-danger:hover {
+        background: #dc2626;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* Toast Notification */
+    .toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 16px 20px;
+        min-width: 300px;
+        box-shadow: var(--shadow-xl);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 10000;
+        animation: slideInRight 0.3s ease-out;
+    }
+
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(100px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .toast.success {
+        border-left: 4px solid #43e97b;
+    }
+
+    .toast.error {
+        border-left: 4px solid #ef4444;
+    }
+
+    .toast.info {
+        border-left: 4px solid #4facfe;
+    }
+
+    .toast-icon {
+        width: 24px;
+        height: 24px;
+        flex-shrink: 0;
+    }
+
+    .toast-icon.success {
+        color: #43e97b;
+    }
+
+    .toast-icon.error {
+        color: #ef4444;
+    }
+
+    .toast-icon.info {
+        color: #4facfe;
+    }
+
+    .toast-content {
+        flex: 1;
+    }
+
+    .toast-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 2px;
+    }
+
+    .toast-message {
+        font-size: 13px;
+        color: var(--text-secondary);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1024px) {
+        .sidebar {
+            transform: translateX(-100%);
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        .main-content {
+            margin-left: 0;
+        }
+
+        .mobile-menu-toggle {
+            display: flex;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .page-actions {
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .search-box input {
+            width: 150px;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .content-wrapper {
+            padding: 20px 16px;
+        }
+
+        .top-bar {
+            padding: 12px 16px;
+        }
+
+        .page-title {
+            font-size: 20px;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .stat-number {
+            font-size: 28px;
+        }
+
+        .quick-actions {
+            grid-template-columns: 1fr;
+        }
+
+        .page-header h2 {
+            font-size: 24px;
+        }
+
+        .modal {
+            width: 95%;
+            max-height: 95vh;
+        }
+
+        .toast {
+            left: 16px;
+            right: 16px;
+            min-width: auto;
+        }
+
+        .data-table {
+            font-size: 12px;
+        }
+
+        .data-table thead th,
+        .data-table tbody td {
+            padding: 12px 8px;
+        }
+    }
+
+    /* ===== MAGANG BATCH CARDS (ENHANCED) ===== */
+    .batch-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 24px;
+        margin-top: 20px;
+        padding-bottom: 40px;
+    }
+
+    .batch-card {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 24px;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all var(--transition-base);
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        min-height: 180px;
+    }
+
+    .batch-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+        border-color: #667eea;
+    }
+
+    /* Active Batch Border/Glow */
+    .batch-card.status-Active {
+        border-left: 4px solid #10b981;
+    }
+
+    .batch-card.status-Finished {
+        border-left: 4px solid #9ca3af;
+        opacity: 0.9;
+    }
+
+    .batch-card.status-Finished:hover {
+        opacity: 1;
+    }
+
+    .batch-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .batch-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 20px;
+    }
+
+    .batch-icon.active {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        box-shadow: 0 4px 6px rgba(67, 233, 123, 0.3);
+    }
+
+    .batch-icon.finished {
+        background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+    }
+
+    .batch-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 4px;
+    }
+
+    .batch-date {
+        font-size: 12px;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .batch-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        background: var(--bg-tertiary);
+        padding: 12px;
+        border-radius: 12px;
+    }
+
+    .stat-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .stat-label {
+        font-size: 11px;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 2px;
+    }
+
+    .stat-value {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .batch-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: auto;
+        padding-top: 16px;
+        border-top: 1px solid var(--divider-color);
+    }
+
+    .status-badge {
+        font-size: 12px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 20px;
+    }
+
+    .status-badge.active {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-badge.finished {
+        background: #f3f4f6;
+        color: #4b5563;
+    }
+
+    /* ===== AUTH OVERLAY ===== */
+    .auth-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--bg-primary);
+        /* Adaptive Background */
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    .auth-box {
+        background: white;
+        width: 100%;
+        max-width: 400px;
+        padding: 40px;
+        border-radius: 24px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        text-align: center;
+    }
+
+    .auth-header {
+        margin-bottom: 30px;
+    }
+
+    .auth-logo {
+        width: 64px;
+        height: 64px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        box-shadow: 0 10px 15px -3px rgba(102, 126, 234, 0.4);
+    }
+
+    .auth-header h2 {
+        font-size: 24px;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 8px;
+    }
+
+    .auth-header p {
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .auth-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 14px;
+        margin-top: 6px;
+        transition: all 0.2s;
+    }
+
+    .auth-input:focus {
+        border-color: #667eea;
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    .auth-btn {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        margin-top: 24px;
+        cursor: pointer;
+        transition: transform 0.1s;
+    }
+
+    .auth-btn:active {
+        transform: scale(0.98);
+    }
+
+    .auth-footer {
+        margin-top: 24px;
+        font-size: 13px;
+    }
+
+    .auth-footer a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    /* ===== ONLINE USERS WIDGET ===== */
+    .user-avatar-sm {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        border: 2px solid white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: 600;
+        color: #64748b;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .user-avatar-sm:hover {
+        transform: translateY(-2px);
+        z-index: 10;
+        border-color: #667eea;
+    }
+
+    /* Dark Mode Support for Auth */
+    /* Dark Mode specific overrides for Auth Box */
+    [data-theme="dark"] .auth-box {
+        background: #1e293b;
+        border: 1px solid #334155;
+        color: white;
+    }
+
+    [data-theme="dark"] .auth-header h2 {
+        color: white;
+    }
+
+    [data-theme="dark"] .auth-header p {
+        color: #94a3b8;
+    }
+
+    [data-theme="dark"] .auth-input {
+        background: #0f172a;
+        border-color: #334155;
+        color: white;
+    }
+
+    [data-theme="dark"] .auth-input:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+    }
+
+    /* Input Labels */
+    .form-group {
+        text-align: left;
+        margin-bottom: 16px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-secondary);
+    }
+
+    [data-theme="dark"] .user-avatar-sm {
+        border-color: #1e293b;
+        background: #334155;
+        color: #e2e8f0;
+    }
+
+    /* Auth Error Message */
+    .auth-error-msg {
+        color: #ef4444;
+        font-size: 12px;
+        margin-top: 4px;
+        font-weight: 500;
+        min-height: 18px;
+        /* Prevent layout shift */
+        display: none;
+        /* Hidden by default */
+        text-align: left;
+    }
+
+    .auth-error-msg.visible {
+        display: block;
+        animation: fadeIn 0.2s ease-out;
+    }
+
+    [data-theme="dark"] .auth-error-msg {
+        color: #f87171;
+    }
+
+    /* ===== USER MENU POPUP ===== */
+    .user-profile {
+        position: relative;
+        cursor: pointer;
+        /* Clickable */
+    }
+
+    .user-menu-popup {
+        position: absolute;
+        bottom: 110%;
+        /* Place above the profile section */
+        left: 0;
+        width: 100%;
+        min-width: 240px;
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        z-index: 100;
+        overflow: hidden;
+        animation: slideUp 0.2s ease-out;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .user-menu-header {
+        padding: 20px;
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .user-avatar-lg {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        font-weight: 700;
+        box-shadow: var(--shadow-md);
+    }
+
+    .user-info-lg {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .user-name-display {
+        font-size: 16px;
+        color: var(--text-primary);
+        margin-bottom: 2px;
+    }
+
+    .user-role-display {
+        font-size: 12px;
+        color: var(--text-secondary);
+    }
+
+    .user-menu-items {
+        list-style: none;
+        padding: 8px;
+        margin: 0;
+    }
+
+    .user-menu-items li {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        color: var(--text-secondary);
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+    .user-menu-items li:hover {
+        background: var(--bg-hover);
+        color: var(--text-primary);
+        transform: translateX(4px);
+    }
+
+    .user-menu-items li svg {
+        stroke-width: 2px;
+    }
+
+    .user-menu-items li.color-danger:hover {
+        background: #fef2f2;
+        color: #ef4444;
+    }
+
+    .menu-divider {
+        height: 1px;
+        background: var(--divider-color);
+        margin: 8px 0;
+        padding: 0 !important;
+        pointer-events: none;
+    }
+
+    [data-theme="dark"] .user-menu-popup {
+        background: #1f2937;
+        border-color: #374151;
+        color: white;
+    }
+
+    [data-theme="dark"] .user-menu-items li:hover {
+        background: #374151;
+        color: white;
+    }
+
+    [data-theme="dark"] .user-menu-items li.color-danger:hover {
+        background: rgba(239, 68, 68, 0.2);
+    }
+
+    /* ===== BATCH CARD STYLES (RESTORED) ===== */
+    .batch-card {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 20px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+        border-left: 4px solid #10b981;
+        /* Default Active Green */
+    }
+
+    .batch-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+        border-color: #667eea;
+    }
+
+    .batch-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+    }
+
+    .batch-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 12px;
+        background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+        color: white;
+        box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+    }
+
+    .batch-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 4px;
+    }
+
+    .batch-date {
+        font-size: 13px;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 16px;
+    }
+
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        background: #d1fae5;
+        color: #047857;
+    }
+
+    /* Status Variants */
+    .batch-card.status-upcoming {
+        border-left-color: #6366f1;
+    }
+
+    .batch-icon.upcoming {
+        background: linear-gradient(135deg, #a5b4fc 0%, #6366f1 100%);
+    }
+
+    .status-badge.upcoming {
+        background: #e0e7ff;
+        color: #4338ca;
+    }
+
+    .batch-card.status-finished {
+        border-left-color: #9ca3af;
+    }
+
+    .batch-icon.finished {
+        background: #9ca3af;
+    }
+
+    .status-badge.finished {
+        background: #f3f4f6;
+        color: #4b5563;
+    }
+
+    /* Footer & Progress */
+    .batch-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--divider-color);
+    }
+
+    .progress-track {
+        background: rgba(0, 0, 0, 0.1);
+        height: 8px;
+        width: 60px;
+        /* Force width */
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    [data-theme="dark"] .progress-track {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: var(--success-gradient);
+        border-radius: 4px;
+        transition: width 0.5s ease-out;
+    }
+
+    .batch-stats {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 12px;
+        background: var(--bg-tertiary);
+        padding: 12px;
+        border-radius: 12px;
+    }
+
+    .stat-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .stat-label {
+        font-size: 11px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    /* ===== MAIN FOOTER ===== */
+    .main-footer {
+        margin-top: auto;
+        padding: 12px 24px;
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: var(--text-secondary);
+        font-size: 13px;
+        position: relative;
+    }
+
+    /* Gradient Top Border */
+    .main-footer::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: var(--primary-gradient);
+        opacity: 0.3;
+    }
+
+    .footer-left {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .footer-brand {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 14px;
+    }
+
+    .footer-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .footer-link {
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: color 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .footer-link:hover {
+        color: #667eea;
+    }
+
+    .footer-divider {
+        width: 1px;
+        height: 14px;
+        background: var(--divider-color);
+    }
+
+    [data-theme="dark"] .main-footer {
+        background: rgba(26, 31, 46, 0.7);
+    }
+
+    @media (max-width: 768px) {
+        .main-footer {
+            flex-direction: column;
+            gap: 16px;
+            text-align: center;
+            padding-bottom: 80px;
+            /* Space for mobile nav */
+        }
+
+        .footer-left {
+            align-items: center;
+        }
+    }
+
+    /* ===== SPIN ANIMATION (for loading) ===== */
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(360deg); }
+    }
+
+    /* ===== LAPORAN REKAP STYLES ===== */
+    .laporan-kpi-card {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 20px;
+        transition: all var(--transition-fast);
+        position: relative;
+        overflow: hidden;
+    }
+    .laporan-kpi-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+    .laporan-kpi-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+    }
+    .laporan-kpi-card.card-magang::before    { background: linear-gradient(90deg,#667eea,#764ba2); }
+    .laporan-kpi-card.card-pkl::before       { background: linear-gradient(90deg,#f093fb,#f5576c); }
+    .laporan-kpi-card.card-kkn::before       { background: linear-gradient(90deg,#4facfe,#00f2fe); }
+    .laporan-kpi-card.card-penelitian::before{ background: linear-gradient(90deg,#43e97b,#38f9d7); }
+    .laporan-kpi-card.card-total::before     { background: linear-gradient(90deg,#fa709a,#fee140); }
+
+    .laporan-rate-bar-wrap {
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--divider-color);
+    }
+    .laporan-rate-bar-wrap:last-child { border-bottom: none; }
+    .laporan-rate-bar-track {
+        height: 10px; border-radius: 5px;
+        background: var(--bg-tertiary);
+        margin-top: 8px;
+        overflow: hidden;
+    }
+    .laporan-rate-bar-fill {
+        height: 100%;
+        border-radius: 5px;
+        transition: width 1s ease-out;
+    }
+
+    /* Tabel rekap cell coloring */
+    .rekap-tawaran { color: #4facfe; font-weight: 600; }
+    .rekap-diterima { color: #43e97b; font-weight: 700; }
+    .rekap-total-row { background: var(--bg-tertiary) !important; font-weight: 700; }
+    .rekap-total-row td { color: var(--text-primary) !important; }
+
+</style>
+
+<script>
+// ============================================================
+// ===== GLOBAL VARIABLES =====================================
+// ============================================================
+let karyawanData = [];
+let karyawanHeaders = [];
+let karyawanFilteredData = [];
+let magangData = [];
+let magangHeaders = [];
+let currentMagangSheet = 'Data Magang';
+let dashboardStats = {};
+let currentRowsPerPage = 50;
+let studentCounter = 1;
+let allBatchData = [];
+let batchSearchQuery = '';
+let batchYearFilter = 'all';
+let autocompleteCache = {
+    'UNIVERSITAS': null,
+    'JURUSAN': null,
+    'NOMOR SURAT': null,
+    'PENGIRIM': null,
+    'JABATAN': null,
+    'PEMBIMBING': null,
+    'UNIT KERJA': null
+};
+
+function initializeApp() {
+    console.log('Initializing DiklatHub App...');
+    updateGreeting();
+    loadDashboardData();
+    initTheme();
+    loadLaporanYears(); // [NEW] Muat daftar tahun untuk sidebar
+    
+    // Auto-refresh online users every 5 minutes
+    setInterval(updateOnlineUsers, 300000);
+    updateOnlineUsers();
+}
+
+// ============================================================
+// ===== PAGE NAVIGATION ======================================
+// ============================================================
+function navigateToPage(pageId) {
+    // 1. Desktop Nav
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    const desktopNav = document.querySelector('.nav-item[data-page="' + pageId + '"]');
+    if (desktopNav) desktopNav.classList.add('active');
+
+    // 2. Mobile Nav
+    document.querySelectorAll('.mobile-nav-item').forEach(el => el.classList.remove('active'));
+    const mobileNav = document.querySelector('.mobile-nav-item[data-page="' + pageId + '"]');
+    if (mobileNav) mobileNav.classList.add('active');
+
+    // 3. Pages
+    document.querySelectorAll('.page-content').forEach(el => {
+        el.classList.remove('active');
+        el.style.display = 'none';
+    });
+    const targetPage = document.getElementById('page-' + pageId);
+    if (targetPage) {
+        targetPage.classList.add('active');
+        targetPage.style.display = 'block';
+    }
+
+    // 4. Trigger Data Loading based on Page ID
+    if (pageId === 'karyawan') {
+        if (typeof loadKaryawanData === 'function') loadKaryawanData();
+    } else if (pageId === 'magang') {
+        if (typeof loadMagangBatches === 'function') loadMagangBatches();
+    } else if (pageId === 'analytics') {
+        if (typeof loadAnalyticsData === 'function') loadAnalyticsData();
+    } else if (pageId === 'activity') {
+        if (typeof loadActivityLog === 'function') loadActivityLog();
+    } else if (pageId === 'dashboard') {
+        if (typeof loadDashboardData === 'function') loadDashboardData();
+    }
+}
+
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) sidebar.classList.toggle('active');
+}
+
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+}
+
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    
+    // Redraw charts if necessary
+    if (typeof trendChart !== 'undefined' && trendChart) loadAnalyticsData();
+}
+
+function updateGreeting() {
+    const greetingEl = document.getElementById('greeting-text');
+    if (greetingEl) {
+        const hour = new Date().getHours();
+        let greeting = 'Selamat Pagi';
+        if (hour >= 11 && hour < 15) greeting = 'Selamat Siang';
+        else if (hour >= 15 && hour < 19) greeting = 'Selamat Sore';
+        else if (hour >= 19) greeting = 'Selamat Malam';
+        greetingEl.textContent = `${greeting}, Admin`;
+    }
+}
+
+function updateOnlineUsers() {
+    google.script.run
+        .withSuccessHandler(function(response) {
+            if (response.success) {
+                const countBadge = document.getElementById('online-count-badge');
+                const avatarContainer = document.getElementById('online-avatars');
+                const container = document.getElementById('online-users-container');
+                
+                if (countBadge) countBadge.textContent = response.users.length;
+                if (container) container.style.display = 'block';
+                
+                if (avatarContainer) {
+                    avatarContainer.innerHTML = response.users.map(user => `
+                        <div class="user-avatar-sm" title="${user.name} (${user.role})">${user.initial}</div>
+                    `).join('');
+                }
+            }
+        })
+        .getOnlineUsers();
+}
+
+function toggleUserMenu() {
+    const popup = document.getElementById('userMenuPopup');
+    if (popup) popup.style.display = popup.style.display === 'none' ? 'block' : 'none';
+}
+
+function showToast(type, title, message) {
+    // Basic toast implementation if not already in styles.html
+    console.log(`[${type.toUpperCase()}] ${title}: ${message}`);
+    // If you have a toast container in index.html, implement rendering here
+}
+
+function animateValue(obj, start, end, duration) {
+    if (!obj) return;
+    let startTimestamp = null;
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        obj.innerHTML = Math.floor(progress * (end - start) + start);
+        if (progress < 1) {
+            window.requestAnimationFrame(step);
+        }
+    };
+    window.requestAnimationFrame(step);
+}
+
+
+// ============================================================
+// ===== DASHBOARD DATA =====
+// ============================================================
+function loadDashboardData() {
+    console.log('Loading Dashboard Data...');
+    updateGreeting();
+
+    google.script.run
+        .withSuccessHandler(function (response) {
+            console.log('Dashboard Data Response:', response);
+            if (response && response.success) {
+                const stats = response.stats || { karyawan: 0, magang: 0, total: 0 };
+                dashboardStats = stats;
+                updateDashboardStats(stats);
+                updateActivityList(response.activity || []);
+                updateSidebarBadges(stats);
+                
+                if (response.widgets) {
+                    renderDashboardWidgets(response.widgets);
+                } else {
+                    renderDashboardWidgets({ composition: { active: 0, finished: 0 }, expiring: [] });
+                }
+            } else {
+                const msg = (response && response.message) || 'Gagal memuat data dashboard';
+                showToast('error', 'Error', msg);
+                console.error('Dashboard Error:', msg);
+                updateDashboardStats({ karyawan: 0, magang: 0, total: 0 });
+            }
+        })
+        .withFailureHandler(function (error) {
+            console.error('Dashboard Connection Failure:', error);
+            showToast('error', 'Koneksi Gagal', 'Gagal terhubung ke server (Dashboard)');
+            updateDashboardStats({ karyawan: 0, magang: 0, total: 0 });
+        })
+        .getDashboardStats();
+
+}
+
+function updateDashboardStats(stats) {
+    animateValue(document.getElementById('stat-karyawan'), 0, stats.karyawan || 0, 1000);
+    animateValue(document.getElementById('stat-magang'), 0, stats.magang || 0, 1000);
+    animateValue(document.getElementById('stat-total'), 0, stats.total || 0, 1000);
+}
+
+function updateSidebarBadges(stats) {
+    // Optional: implementation if badges are desired
+}
+
+function updateActivityList(activities) {
+    const activityList = document.getElementById('activity-list');
+    if (!activityList) return;
+
+    if (activities.length === 0) {
+        activityList.innerHTML = '<p style="text-align:center; color:var(--text-secondary); padding:20px;">Belum ada aktivitas.</p>';
+        return;
+    }
+
+    const actionColors = {
+        'magang': '#f093fb',
+        'karyawan': '#667eea'
+    };
+
+    activityList.innerHTML = activities.map(activity => `
+        <div class="activity-item" style="border-left: 3px solid ${activity.type === 'magang' ? actionColors.magang : actionColors.karyawan}">
+            <div class="activity-icon" style="background: ${activity.type === 'magang' ? 'rgba(240, 147, 251, 0.1)' : 'rgba(102, 126, 234, 0.1)'}; color: ${activity.type === 'magang' ? actionColors.magang : actionColors.karyawan};">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    ${activity.type === 'karyawan'
+                        ? '<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/>'
+                        : '<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="15 11 17 13 21 9"/>'} 
+                </svg>
+            </div>
+            <div class="activity-content">
+                <p style="font-size: 14px; margin-bottom: 2px;">
+                    <strong style="color: var(--text-primary);">${activity.name}</strong> 
+                    <span style="color: var(--text-secondary);">${activity.action}</span>
+                </p>
+                <span class="activity-time" style="font-size: 12px; color: var(--text-muted);">${activity.time}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderDashboardWidgets(data) {
+    // Implementation for composition charts or expiring interns if needed
+}
+
+// ============================================================
+// ===== DATA KARYAWAN =====
+// ============================================================
+function loadKaryawanData() {
+    const loadingEl = document.getElementById('karyawan-loading');
+    const tableWrapper = document.getElementById('karyawan-table-wrapper');
+    
+    if (loadingEl) loadingEl.style.display = 'block';
+    if (tableWrapper) tableWrapper.style.display = 'none';
+
+    google.script.run
+        .withSuccessHandler(function (response) {
+            console.log('Karyawan Data Response:', response);
+            if (loadingEl) loadingEl.style.display = 'none';
+            if (tableWrapper) tableWrapper.style.display = 'block';
+
+            if (response && response.success) {
+                karyawanData = response.data;
+                karyawanHeaders = response.headers;
+                renderKaryawanTable(karyawanData);
+            } else {
+                const msg = (response && response.message) || 'Gagal memuat data karyawan';
+                showToast('error', 'Error', msg);
+                console.error('Karyawan Error:', msg);
+                if (document.getElementById('karyawan-table-body')) {
+                    document.getElementById('karyawan-table-body').innerHTML = `<tr><td colspan="10" style="text-align:center; color:#ef4444;">${msg}</td></tr>`;
+                }
+            }
+        })
+        .withFailureHandler(function (error) {
+            console.error('Karyawan Connection Failure:', error);
+            if (loadingEl) loadingEl.style.display = 'none';
+            if (tableWrapper) tableWrapper.style.display = 'block';
+            showToast('error', 'Koneksi Gagal', 'Gagal terhubung ke server (Karyawan)');
+        })
+        .getKaryawanData();
+
+
+}
+
+function renderKaryawanTable(data) {
+    const tbody = document.getElementById('karyawan-table-body');
+    const thead = document.getElementById('karyawan-table-head');
+    if (!tbody || !thead) return;
+
+    // Render Headers
+    thead.innerHTML = `
+        <tr>
+            ${karyawanHeaders.map(h => `<th>${h}</th>`).join('')}
+            <th>Aksi</th>
+        </tr>
+    `;
+
+    // Render Rows
+    if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="${karyawanHeaders.length + 1}" style="text-align:center;">Tidak ada data karyawan.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = data.map((row, index) => `
+        <tr>
+            ${karyawanHeaders.map(h => `<td>${row[h] || '-'}</td>`).join('')}
+            <td>
+                <div class="table-actions">
+                    <button class="btn-icon edit" onclick="showEditKaryawanModal(${index})" title="Edit">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button class="btn-icon delete" onclick="confirmDeleteKaryawan(${index})" title="Hapus">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function confirmDeleteKaryawan(index) {
+    if (confirm('Apakah Anda yakin ingin menghapus data karyawan ini?')) {
+        google.script.run
+            .withSuccessHandler(function (response) {
+                if (response.success) {
+                    showToast('success', 'Berhasil', 'Data karyawan dihapus');
+                    loadKaryawanData();
+                    loadDashboardData();
+                } else {
+                    showToast('error', 'Error', response.message);
+                }
+            })
+            .deleteKaryawan(index);
+    }
+}
+
+// ============================================================
+// ===== DATA MAGANG =====
+// ============================================================
+function loadMagangBatches() {
+    const batchView = document.getElementById('magang-batch-view');
+    const listView = document.getElementById('magang-list-view');
+    const grid = document.getElementById('batch-grid');
+
+    if (batchView) batchView.style.display = 'block';
+    if (listView) listView.style.display = 'none';
+
+    if (grid) grid.innerHTML = '<div class="loading-state"><p>Memuat daftar periode...</p></div>';
+
+    google.script.run
+        .withSuccessHandler(function (response) {
+            console.log('Magang Batch Response:', response);
+            if (response && response.success && response.batchNames) {
+                renderInitialBatchGrid(response.batchNames);
+                fetchBatchDetails(response.batchNames);
+            } else {
+                const msg = (response && response.message) || 'Gagal memuat daftar batch';
+                if (grid) grid.innerHTML = `<div style="text-align:center; padding:40px; color:#ef4444;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:16px; opacity:0.5;">
+                        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <p>${msg}</p>
+                    <button class="btn-secondary" onclick="loadMagangBatches()" style="margin-top:16px;">Coba Lagi</button>
+                </div>`;
+                console.error('Magang Batch Error:', msg);
+            }
+        })
+        .withFailureHandler(function (error) {
+            console.error('Magang Batch Connection Failure:', error);
+            if (grid) grid.innerHTML = `<div style="text-align:center; padding:40px; color:#ef4444;">
+                <p>Gagal terhubung ke server. Silakan periksa koneksi internet atau Spreadsheet ID.</p>
+                <button class="btn-secondary" onclick="loadMagangBatches()" style="margin-top:16px;">Coba Lagi</button>
+            </div>`;
+        })
+        .getMagangBatchNames();
+
+
+}
+
+function renderInitialBatchGrid(batchNames) {
+    const grid = document.getElementById('batch-grid');
+    if (!grid) return;
+
+    if (batchNames.length === 0) {
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:20px; color:var(--text-secondary);">Belum ada periode magang.</div>';
+        return;
+    }
+
+    grid.innerHTML = batchNames.map(name => `
+        <div class="batch-card" id="batch-card-${name.replace(/\s+/g, '-')}" onclick="loadMagangData('${name}')">
+            <div class="batch-header">
+                <div class="batch-icon" style="background: var(--bg-tertiary); color: var(--text-secondary);">
+                    <svg class="rotate-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+                </div>
+            </div>
+            <div style="margin-top: 12px;">
+                <div class="batch-title" style="font-weight:700; font-size:16px;">${name}</div>
+                <div class="batch-date" style="color: var(--text-muted); font-size:12px;">Memuat rincian...</div>
+            </div>
+            <div class="batch-stats" style="margin-top:12px; display:flex; gap:12px; opacity:0.6;">
+                <div class="stat-item">
+                    <div class="stat-label" style="font-size:10px;">TOTAL</div>
+                    <div class="stat-value">-</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label" style="font-size:10px;">AKTIF</div>
+                    <div class="stat-value">-</div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function fetchBatchDetails(batchNames) {
+    batchNames.forEach(name => {
+        google.script.run
+            .withSuccessHandler(function (response) {
+                console.log(`Metadata for ${name}:`, response);
+                if (response && response.success && response.data) {
+                    updateBatchCard(response.data);
+                } else {
+                    console.error(`Failed to fetch metadata for ${name}:`, response ? response.message : 'No response');
+                    // Update card with error state if needed
+                    const cardId = `batch-card-${name.replace(/\s+/g, '-')}`;
+                    const card = document.getElementById(cardId);
+                    if (card) {
+                        const date = card.querySelector('.batch-date');
+                        if (date) date.textContent = 'Gagal memuat data';
+                    }
+                }
+            })
+            .withFailureHandler(function(error) {
+                console.error(`Connection error for ${name} metadata:`, error);
+            })
+            .getBatchMetadata(name);
+    });
+}
+
+function updateBatchCard(data) {
+    if (!data || !data.name) return;
+    
+    // Use consistent ID generation
+    const safeName = data.name.replace(/\s+/g, '-');
+    const cardId = `batch-card-${safeName}`;
+    const card = document.getElementById(cardId);
+    
+    if (!card) {
+        console.warn(`Card with ID ${cardId} not found for data:`, data);
+        return;
+    }
+
+    const stats = card.querySelector('.batch-stats');
+    const date = card.querySelector('.batch-date');
+    const icon = card.querySelector('.batch-icon');
+
+    if (date) date.textContent = data.dateRange || '-';
+    if (stats) {
+        stats.style.opacity = '1';
+        // Ensure values are numbers or 0
+        const total = typeof data.count !== 'undefined' ? data.count : 0;
+        const active = typeof data.activeCount !== 'undefined' ? data.activeCount : 0;
+        
+        stats.innerHTML = `
+            <div class="stat-item">
+                <div class="stat-label" style="font-size:10px;">TOTAL</div>
+                <div class="stat-value" style="font-weight:700;">${total}</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label" style="font-size:10px;">AKTIF</div>
+                <div class="stat-value" style="font-weight:700; color:#10b981;">${active}</div>
+            </div>
+        `;
+    }
+    
+    if (icon) {
+        icon.className = `batch-icon ${data.status ? data.status.toLowerCase() : ''}`;
+        if (data.status === 'Active') {
+            icon.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+        } else {
+            icon.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
+        }
+    }
+}
+
+
+function loadMagangData(sheetName) {
+    currentMagangSheet = sheetName;
+    const batchView = document.getElementById('magang-batch-view');
+    const listView = document.getElementById('magang-list-view');
+    const batchTitle = document.getElementById('magang-batch-title');
+    const loadingEl = document.getElementById('magang-loading');
+    const tableWrapper = document.getElementById('magang-table-wrapper');
+
+    if (batchView) batchView.style.display = 'none';
+    if (listView) listView.style.display = 'block';
+    if (batchTitle) batchTitle.textContent = 'Data Magang - ' + sheetName;
+    if (loadingEl) loadingEl.style.display = 'block';
+    if (tableWrapper) tableWrapper.style.display = 'none';
+
+    google.script.run
+        .withSuccessHandler(function (response) {
+            if (response.success) {
+                const rawData = response.data;
+                const headers = response.headers;
+                magangHeaders = headers;
+
+                magangData = rawData.map((row, index) => {
+                    let obj = {};
+                    headers.forEach((h, i) => {
+                        obj[h] = row[i];
+                    });
+                    obj._originalIndex = index;
+                    return obj;
+                });
+
+                renderMagangTable(magangData);
+                if (loadingEl) loadingEl.style.display = 'none';
+                if (tableWrapper) tableWrapper.style.display = 'block';
+            } else {
+                showToast('error', 'Error', response.message);
+            }
+        })
+        .getMagangData(sheetName);
+}
+
+function handleKetChange(rowIndex, newValue) {
+    showToast('info', 'Updating...', 'Memperbarui keterangan...');
+    google.script.run
+        .withSuccessHandler(function (response) {
+            if (response.success) {
+                showToast('success', 'Berhasil', 'Keterangan diperbarui');
+                // Update local data to reflect change without full reload if possible
+                if (magangData) {
+                    const item = magangData.find(d => d._originalIndex === rowIndex);
+                    if (item) item.KET = newValue;
+                }
+                // Refresh dashboard stats because active/finished count depends on KET
+                loadDashboardData();
+                
+                // Update color attribute
+                const select = document.querySelector(`select[onchange*="handleKetChange(${rowIndex},"]`);
+                if (select) select.setAttribute('data-status', newValue);
+            } else {
+                showToast('error', 'Gagal', response.message);
+            }
+        })
+        .updateMagangKet(rowIndex, newValue, currentMagangSheet);
+}
+
+function handleKehadiranChange(rowIndex, newValue) {
+    showToast('info', 'Updating...', 'Memperbarui kehadiran...');
+    google.script.run
+        .withSuccessHandler(function (response) {
+            if (response.success) {
+                showToast('success', 'Berhasil', 'Status kehadiran diperbarui');
+                if (magangData) {
+                    const item = magangData.find(d => d._originalIndex === rowIndex);
+                    if (item) item.KEHADIRAN = newValue;
+                }
+                // Update color attribute
+                const select = document.querySelector(`select[onchange*="handleKehadiranChange(${rowIndex},"]`);
+                if (select) select.setAttribute('data-status', newValue);
+            } else {
+                showToast('error', 'Gagal', response.message);
+            }
+        })
+        .updateMagangKehadiran(rowIndex, newValue, currentMagangSheet);
+}
+
+function renderMagangTable(data) {
+    const tbody = document.getElementById('magang-table-body');
+    const thead = document.getElementById('magang-table-head');
+    if (!tbody || !thead) return;
+
+    thead.innerHTML = `
+        <tr>
+            ${magangHeaders.map(h => `<th>${h}</th>`).join('')}
+            <th>Aksi</th>
+        </tr>
+    `;
+
+    if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="${magangHeaders.length + 1}" style="text-align:center;">Tidak ada data magang di periode ini.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = data.map(row => `
+        <tr>
+            ${magangHeaders.map(h => {
+                if (h === 'KET') {
+                    const statusOptions = ['Sudah Diteruskan', 'DITOLAK', 'Selesai', 'Proses', ''];
+                    const currentVal = row[h] || '';
+                    return `
+                        <td>
+                            <select class="table-select" data-status="${currentVal}" onchange="handleKetChange(${row._originalIndex}, this.value)">
+                                ${statusOptions.map(opt => `<option value="${opt}" ${currentVal === opt ? 'selected' : ''}>${opt || '-'}</option>`).join('')}
+                            </select>
+                        </td>
+                    `;
+                } else if (h === 'KEHADIRAN') {
+                    const presenceOptions = ['Hadir', 'Tidak Hadir', '-', ''];
+                    const currentVal = row[h] || '';
+                    return `
+                        <td>
+                            <select class="table-select" data-status="${currentVal}" onchange="handleKehadiranChange(${row._originalIndex}, this.value)">
+                                ${presenceOptions.map(opt => `<option value="${opt}" ${currentVal === opt ? 'selected' : ''}>${opt || '-'}</option>`).join('')}
+                            </select>
+                        </td>
+                    `;
+                }
+                return `<td>${row[h] || '-'}</td>`;
+            }).join('')}
+            <td>
+                <div class="table-actions">
+                    <button class="btn-icon edit" onclick="showEditMagangModal(${row._originalIndex})" title="Edit">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button class="btn-icon delete" onclick="confirmDeleteMagang(${row._originalIndex})" title="Hapus">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+
+function confirmDeleteMagang(index) {
+    if (confirm('Apakah Anda yakin ingin menghapus data magang ini?')) {
+        google.script.run
+            .withSuccessHandler(function (response) {
+                if (response.success) {
+                    showToast('success', 'Berhasil', 'Data magang dihapus');
+                    loadMagangData(currentMagangSheet);
+                    loadDashboardData();
+                } else {
+                    showToast('error', 'Error', response.message);
+                }
+            })
+            .deleteMagang(index, currentMagangSheet);
+    }
+}
+
+// ============================================================
+// ===== ANALYTICS PAGE LOGIC =====
+// ============================================================
+let trendChart = null;
+let universityChart = null;
+let majorChart = null;
+let unitChart = null;
+
+function loadAnalyticsData() {
+    const yearFilter = document.getElementById('analytics-year-filter')?.value || 'all';
+
+    google.script.run
+        .withSuccessHandler(function (response) {
+            if (response.success) {
+                renderAnalyticsCharts(response);
+            } else {
+                showToast('error', 'Analytics Error', response.message);
+            }
+        })
+        .withFailureHandler(function (error) {
+            showToast('error', 'Error', error.message);
+        })
+        .getAnalyticsData(yearFilter);
+}
+
+function renderAnalyticsCharts(data) {
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+    const textColor = isDarkMode ? '#e2e8f0' : '#64748b';
+
+    // Update KPI Cards
+    if (data.stats) {
+        if (document.getElementById('kpi-total')) document.getElementById('kpi-total').innerText = data.stats.total;
+        if (document.getElementById('kpi-active')) document.getElementById('kpi-active').innerText = data.stats.active;
+        if (document.getElementById('kpi-univ')) document.getElementById('kpi-univ').innerText = data.stats.univCount;
+    }
+
+    // Trend Chart
+    const ctxTrend = document.getElementById('chart-trend');
+    if (ctxTrend && typeof Chart !== 'undefined') {
+        if (trendChart) trendChart.destroy();
+        trendChart = new Chart(ctxTrend, {
+            type: 'line',
+            data: {
+                labels: data.trend.labels,
+                datasets: [{
+                    label: 'Jumlah Peserta',
+                    data: data.trend.data,
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: gridColor }, ticks: { color: textColor } },
+                    x: { grid: { color: gridColor }, ticks: { color: textColor } }
+                }
+            }
+        });
+    }
+
+    // University Chart
+    const ctxUniv = document.getElementById('chart-university');
+    if (ctxUniv && typeof Chart !== 'undefined') {
+        if (universityChart) universityChart.destroy();
+        universityChart = new Chart(ctxUniv, {
+            type: 'pie',
+            data: {
+                labels: data.university.labels,
+                datasets: [{
+                    data: data.university.data,
+                    backgroundColor: ['#667eea', '#764ba2', '#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#8b5cf6', '#94a3b8'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { labels: { color: textColor } } }
+            }
+        });
+    }
+
+    // Major Chart
+    const ctxMajor = document.getElementById('chart-major');
+    if (ctxMajor && typeof Chart !== 'undefined') {
+        if (majorChart) majorChart.destroy();
+        majorChart = new Chart(ctxMajor, {
+            type: 'bar',
+            data: {
+                labels: data.major.labels,
+                datasets: [{
+                    label: 'Jumlah Peserta',
+                    data: data.major.data,
+                    backgroundColor: '#764ba2'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { display: false }, ticks: { color: textColor } },
+                    x: { grid: { color: gridColor }, ticks: { color: textColor } }
+                }
+            }
+        });
+    }
+}
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Add click listeners to all nav items that have data-page
+    document.querySelectorAll('[data-page]').forEach(function(item) {
+        item.addEventListener('click', function(e) {
+            // Ignore if it's just the submenu toggle
+            if (this.classList.contains('has-submenu') && e.target.closest('.nav-chevron')) {
+                return;
+            }
+            const pageId = this.getAttribute('data-page');
+            if (pageId) {
+                navigateToPage(pageId);
+            }
+        });
+    });
+    
+    // Default page
+    navigateToPage('dashboard');
+    
+    // Init app
+    initializeApp();
+});
+
+function showProfile() {
+    showToast('info', 'Profil', 'Fitur profil akan segera hadir.');
+}
+
+function logout() {
+    if (confirm('Apakah Anda yakin ingin keluar?')) {
+        showToast('info', 'Logging out...', 'Sedang keluar...');
+        // In a real app, you'd handle session termination here
+        window.location.reload();
+    }
+}
+
+function showAddMagangModal() {
+    // Basic implementation of the add intern modal
+    const modalHtml = `
+        <div class="modal-overlay" onclick="closeModal(event)">
+            <div class="modal" onclick="event.stopPropagation()" style="max-width: 500px;">
+                <div class="modal-header">
+                    <h3>Tambah Data Magang</h3>
+                    <button class="modal-close" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Form penambahan data magang di batch <strong>${currentMagangSheet}</strong>.</p>
+                    <!-- Form fields would go here -->
+                    <div style="padding: 20px; text-align: center; color: var(--text-secondary);">
+                        Fitur form input sedang diaktifkan kembali.
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding: 20px; text-align: right; border-top: 1px solid var(--border-color);">
+                    <button class="btn-secondary" onclick="closeModal()">Batal</button>
+                    <button class="btn-primary" disabled>Simpan Data</button>
+                </div>
+            </div>
+        </div>
+    `;
+    const container = document.getElementById('modal-container');
+    if (container) container.innerHTML = modalHtml;
+}
+
+function showAddKaryawanModal() {
+    showToast('info', 'Tambah Karyawan', 'Fitur tambah karyawan sedang diaktifkan kembali.');
+}
+
+function showEditKaryawanModal(index) {
+    showToast('info', 'Edit Karyawan', 'Fitur edit karyawan sedang diaktifkan kembali.');
+}
+
+function showEditMagangModal(index) {
+    showToast('info', 'Edit Magang', 'Fitur edit magang sedang diaktifkan kembali.');
+}
+
+function closeModal(arg) {
+    if (arg && (arg instanceof Event || arg.target)) {
+        if (arg.target.classList.contains('modal-overlay')) {
+            const container = document.getElementById('modal-container');
+            if (container) container.innerHTML = '';
+        }
+        return;
+    }
+
+    if (typeof arg === 'string') {
+        const modal = document.getElementById(arg);
+        if (modal) modal.remove();
+        return;
+    }
+
+    const container = document.getElementById('modal-container');
+    if (container) container.innerHTML = '';
+}
+
+
+// ============================================================
+// ===== LAPORAN REKAP MAGANG FUNCTIONS =======================
+// ============================================================
+
+let _laporanRawData = null;
+let _laporanChartInstance = null;
+
+/**
+ * Main loader - dipanggil saat user klik menu Laporan
+ */
+/**
+ * Toggle sub-menu visibility
+ */
+function toggleSubmenu(id) {
+    const submenu = document.getElementById(id);
+    if (!submenu) return;
+    
+    // Toggle class
+    submenu.classList.toggle('show');
+    
+    // Toggle parent class for chevron rotation
+    const parent = submenu.previousElementSibling;
+    if (parent) parent.classList.toggle('open');
+    
+    // Smooth transition
+    if (submenu.classList.contains('show')) {
+        submenu.style.maxHeight = submenu.scrollHeight + "px";
+    } else {
+        submenu.style.maxHeight = "0px";
+    }
+}
+
+/**
+ * Navigasi ke bulan tertentu di laporan rekap
+ */
+function navigateToMonth(monthIndex) {
+    // 1. Activate page
+    navigateToPage('laporan');
+    
+    // 2. Load data if needed or refresh
+    if (!_laporanRawData || document.getElementById('laporan-content').style.display === 'none') {
+        loadLaporanRekap();
+    }
+    
+    // 3. Highlight submenu item
+    const items = document.querySelectorAll('.submenu-item');
+    items.forEach((item, idx) => {
+        if (idx === monthIndex) item.classList.add('active');
+        else item.classList.remove('active');
+    });
+
+    // 4. Scroll to column in table (delayed to ensure table is rendered)
+    setTimeout(() => {
+        const table = document.getElementById('laporan-main-table');
+        if (!table) return;
+        
+        // Month columns are in pairs (SM, SACC) starting from column index 1
+        const targetColIdx = (monthIndex * 2) + 1;
+        const rows = table.rows;
+        if (rows.length > 0 && rows[0].cells[targetColIdx]) {
+            rows[0].cells[targetColIdx].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            
+            // Highlight effect on the column headers
+            const headerCell = rows[0].cells[targetColIdx];
+            headerCell.style.backgroundColor = 'rgba(102, 126, 234, 0.2)';
+            setTimeout(() => {
+                headerCell.style.backgroundColor = '';
+            }, 2000);
+        }
+    }, 800);
+}
+
+function loadLaporanRekap() {
+    const yearInput = document.getElementById('laporan-year-filter');
+    const year = yearInput && yearInput.value ? yearInput.value : new Date().getFullYear().toString();
+
+    // Set default year
+    if (yearInput && !yearInput.value) yearInput.value = year;
+
+    document.getElementById('laporan-loading').style.display = 'block';
+    document.getElementById('laporan-content').style.display  = 'none';
+    document.getElementById('btn-export-laporan').style.display = 'none';
+
+    google.script.run
+        .withSuccessHandler(function(res) {
+            document.getElementById('laporan-loading').style.display = 'none';
+            if (!res || !res.success) {
+                document.getElementById('laporan-loading').innerHTML =
+                    '<p style="color:#ef4444;">Gagal memuat data: ' + (res ? res.message : 'Unknown error') + '</p>';
+                document.getElementById('laporan-loading').style.display = 'block';
+                return;
+            }
+            _laporanRawData = res;
+            renderLaporanAll(res);
+            document.getElementById('laporan-content').style.display = 'block';
+            document.getElementById('btn-export-laporan').style.display = 'flex';
+        })
+        .withFailureHandler(function(err) {
+            document.getElementById('laporan-loading').innerHTML =
+                '<p style="color:#ef4444;">Error: ' + err.message + '</p>';
+        })
+        .getRekapMagangReport(year);
+}
+
+/**
+ * Render semua komponen halaman laporan
+ */
+function renderLaporanAll(res) {
+    renderLaporanSummaryCards(res);
+    renderLaporanGrandTotal(res);
+    renderLaporanTable(res);
+    renderLaporanChart(res, 'all');
+    renderLaporanRateBars(res);
+}
+
+/**
+ * Summary KPI Cards (satu per kategori + 1 total)
+ */
+function renderLaporanSummaryCards(res) {
+    const container = document.getElementById('laporan-summary-cards');
+    if (!container) return;
+
+    const colors = {
+        'Magang':      { cls: 'card-magang',     emoji: '🎓', color: '#667eea' },
+        'PKL':         { cls: 'card-pkl',         emoji: '🏭', color: '#f5576c' },
+        'KKN Profesi': { cls: 'card-kkn',         emoji: '🌱', color: '#4facfe' },
+        'Penelitian':  { cls: 'card-penelitian',  emoji: '🔬', color: '#43e97b' },
+    };
+
+    let html = '';
+    res.kategori.forEach(k => {
+        const s = res.summary[k];
+        const c = colors[k] || { cls: '', emoji: '📄', color: '#9ca3af' };
+        const rateColor = s.rate >= 80 ? '#43e97b' : s.rate >= 50 ? '#f59e0b' : '#ef4444';
+        html += `
+        <div class="laporan-kpi-card ${c.cls}">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <span style="font-size:24px;">${c.emoji}</span>
+                <span style="font-size:22px; font-weight:800; color:${rateColor};">${s.rate}%</span>
+            </div>
+            <div style="font-size:16px; font-weight:700; color:var(--text-primary); margin-bottom:6px;">${k}</div>
+            <div style="display:flex; gap:16px;">
+                <div>
+                    <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">SM (Tawaran)</div>
+                    <div style="font-size:20px; font-weight:700; color:#4facfe;">${s.totalTawaran}</div>
+                </div>
+                <div>
+                    <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">SACC (Diterima)</div>
+                    <div style="font-size:20px; font-weight:700; color:#43e97b;">${s.totalDiterima}</div>
+                </div>
+            </div>
+        </div>`;
+    });
+    container.innerHTML = html;
+}
+
+/**
+ * Grand total banner
+ */
+function renderLaporanGrandTotal(res) {
+    const gt = res.grandTotal;
+    const labelEl = document.getElementById('laporan-grand-label');
+    const rateEl  = document.getElementById('laporan-grand-rate');
+    if (labelEl) labelEl.textContent = gt.totalTawaran + ' Tawaran / ' + gt.totalDiterima + ' Diterima';
+    if (rateEl)  rateEl.textContent  = gt.rate + '%';
+}
+
+/**
+ * Tabel utama — format persis Over Acceptance Rate:
+ * baris = kategori, kolom = bulan (SM | SACC) + Total
+ */
+function renderLaporanTable(res) {
+    const thead = document.getElementById('laporan-main-thead');
+    const tbody = document.getElementById('laporan-main-tbody');
+    if (!thead || !tbody) return;
+
+    // --- HEADER ---
+    // Row 1: Perihal | Jan (2 col) | Feb (2 col) | ... | Total
+    let thRow1 = '<tr style="background:var(--bg-tertiary);">';
+    thRow1 += '<th rowspan="2" style="text-align:left;padding:10px 14px;position:sticky;left:0;background:var(--bg-tertiary);z-index:5;min-width:130px;">PERIHAL</th>';
+    res.bulan.forEach(b => {
+        thRow1 += `<th colspan="2" style="text-align:center;padding:8px;border-left:2px solid var(--border-color);">${b.toUpperCase()}</th>`;
+    });
+    thRow1 += '<th colspan="2" style="text-align:center;padding:8px;border-left:2px solid var(--border-color);background:rgba(102,126,234,.15);">TOTAL</th>';
+    thRow1 += '</tr>';
+
+    // Row 2: SM | SACC untuk setiap bulan
+    let thRow2 = '<tr style="background:var(--bg-tertiary);">';
+    for (let m = 0; m < 12; m++) {
+        thRow2 += '<th style="text-align:center;padding:6px 8px;font-size:11px;color:#4facfe;border-left:2px solid var(--border-color);">SM</th>';
+        thRow2 += '<th style="text-align:center;padding:6px 8px;font-size:11px;color:#43e97b;">SACC</th>';
+    }
+    thRow2 += '<th style="text-align:center;padding:6px 8px;font-size:11px;color:#4facfe;border-left:2px solid var(--border-color);background:rgba(102,126,234,.15);">SM</th>';
+    thRow2 += '<th style="text-align:center;padding:6px 8px;font-size:11px;color:#43e97b;background:rgba(102,126,234,.15);">SACC</th>';
+    thRow2 += '</tr>';
+
+    thead.innerHTML = thRow1 + thRow2;
+
+    // --- BODY ---
+    let tbHTML = '';
+
+    // Satu row per kategori
+    res.kategori.forEach((k, ki) => {
+        const rowBg = ki % 2 === 0 ? '' : 'background:var(--bg-hover);';
+        tbHTML += `<tr style="${rowBg}">`;
+        tbHTML += `<td style="font-weight:600;padding:10px 14px;position:sticky;left:0;background:${ki % 2 === 0 ? 'var(--bg-secondary)' : 'var(--bg-hover)'};z-index:3;">${k}</td>`;
+
+        let totalTawaran = 0, totalDiterima = 0;
+        for (let m = 0; m < 12; m++) {
+            const cell = res.data[k][m];
+            totalTawaran  += cell.tawaran;
+            totalDiterima += cell.diterima;
+            tbHTML += `<td class="rekap-tawaran"  style="border-left:2px solid var(--border-color);padding:8px;">${cell.tawaran || '-'}</td>`;
+            tbHTML += `<td class="rekap-diterima" style="padding:8px;">${cell.diterima || '-'}</td>`;
+        }
+        // Total columns
+        tbHTML += `<td class="rekap-tawaran"  style="border-left:2px solid var(--border-color);padding:8px;background:rgba(102,126,234,.1);">${totalTawaran}</td>`;
+        tbHTML += `<td class="rekap-diterima" style="padding:8px;background:rgba(102,126,234,.1);">${totalDiterima}</td>`;
+        tbHTML += '</tr>';
+    });
+
+    // Row JUMLAH (grand total per bulan)
+    tbHTML += '<tr class="rekap-total-row" style="border-top:2px solid var(--border-color);">';
+    tbHTML += '<td style="font-weight:700;padding:10px 14px;position:sticky;left:0;background:var(--bg-tertiary);z-index:3;">JUMLAH</td>';
+
+    let grandSM = 0, grandSACC = 0;
+    for (let m = 0; m < 12; m++) {
+        let monthSM = 0, monthSACC = 0;
+        res.kategori.forEach(k => {
+            monthSM   += res.data[k][m].tawaran;
+            monthSACC += res.data[k][m].diterima;
+        });
+        grandSM   += monthSM;
+        grandSACC += monthSACC;
+        tbHTML += `<td style="border-left:2px solid var(--border-color);padding:8px;color:#4facfe;font-weight:700;">${monthSM || '-'}</td>`;
+        tbHTML += `<td style="padding:8px;color:#43e97b;font-weight:700;">${monthSACC || '-'}</td>`;
+    }
+    tbHTML += `<td style="border-left:2px solid var(--border-color);padding:8px;color:#4facfe;font-weight:800;background:rgba(102,126,234,.15);">${grandSM}</td>`;
+    tbHTML += `<td style="padding:8px;color:#43e97b;font-weight:800;background:rgba(102,126,234,.15);">${grandSACC}</td>`;
+    tbHTML += '</tr>';
+
+    tbody.innerHTML = tbHTML;
+}
+
+/**
+ * Chart Bar — Tawaran vs Diterima per bulan
+ */
+function renderLaporanChart(res, filterKategori) {
+    const ctx = document.getElementById('chart-laporan-rekap');
+    if (!ctx) return;
+
+    // Aggregate bulan
+    const tawaranArr  = [];
+    const diterimaArr = [];
+
+    for (let m = 0; m < 12; m++) {
+        let sm = 0, sacc = 0;
+        res.kategori.forEach(k => {
+            if (filterKategori === 'all' || filterKategori === k) {
+                sm   += res.data[k][m].tawaran;
+                sacc += res.data[k][m].diterima;
+            }
+        });
+        tawaranArr.push(sm);
+        diterimaArr.push(sacc);
+    }
+
+    if (_laporanChartInstance) {
+        _laporanChartInstance.destroy();
+        _laporanChartInstance = null;
+    }
+
+    _laporanChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: res.bulan,
+            datasets: [
+                {
+                    label: 'SM (Tawaran / Surat Masuk)',
+                    data: tawaranArr,
+                    backgroundColor: 'rgba(79,172,254,0.7)',
+                    borderColor: '#4facfe',
+                    borderWidth: 2,
+                    borderRadius: 6,
+                },
+                {
+                    label: 'SACC (Diterima)',
+                    data: diterimaArr,
+                    backgroundColor: 'rgba(67,233,123,0.7)',
+                    borderColor: '#43e97b',
+                    borderWidth: 2,
+                    borderRadius: 6,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: {
+                    callbacks: {
+                        afterLabel: function(ctx) {
+                            const idx = ctx.dataIndex;
+                            const sm   = tawaranArr[idx];
+                            const sacc = diterimaArr[idx];
+                            if (ctx.datasetIndex === 1 && sm > 0) {
+                                return 'Rate: ' + Math.round((sacc / sm) * 100) + '%';
+                            }
+                            return '';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
+        }
+    });
+}
+
+/**
+ * Switch chart filter kategori
+ */
+function switchLaporanChart(filterKategori) {
+    if (!_laporanRawData) return;
+    renderLaporanChart(_laporanRawData, filterKategori);
+}
+
+/**
+ * Acceptance rate progress bars per kategori
+ */
+function renderLaporanRateBars(res) {
+    const container = document.getElementById('laporan-rate-bars');
+    if (!container) return;
+
+    const gradients = {
+        'Magang':      'linear-gradient(90deg,#667eea,#764ba2)',
+        'PKL':         'linear-gradient(90deg,#f093fb,#f5576c)',
+        'KKN Profesi': 'linear-gradient(90deg,#4facfe,#00f2fe)',
+        'Penelitian':  'linear-gradient(90deg,#43e97b,#38f9d7)',
+    };
+
+    let html = '';
+    res.kategori.forEach(k => {
+        const s = res.summary[k];
+        const rateColor = s.rate >= 80 ? '#43e97b' : s.rate >= 50 ? '#f59e0b' : '#ef4444';
+        const pct = Math.min(s.rate, 100);
+        const grad = gradients[k] || 'linear-gradient(90deg,#9ca3af,#6b7280)';
+        html += `
+        <div class="laporan-rate-bar-wrap">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <div style="font-weight:600; font-size:14px; color:var(--text-primary);">${k}</div>
+                <div style="display:flex; gap:16px; align-items:center;">
+                    <span style="font-size:12px; color:var(--text-secondary);">${s.totalDiterima} / ${s.totalTawaran}</span>
+                    <span style="font-size:16px; font-weight:800; color:${rateColor};">${s.rate}%</span>
+                </div>
+            </div>
+            <div class="laporan-rate-bar-track">
+                <div class="laporan-rate-bar-fill" style="width:0%; background:${grad};"
+                     data-pct="${pct}"></div>
+            </div>
+        </div>`;
+    });
+    container.innerHTML = html;
+
+    // Animate bars setelah render
+    setTimeout(() => {
+        container.querySelectorAll('.laporan-rate-bar-fill').forEach(el => {
+            el.style.width = el.dataset.pct + '%';
+        });
+    }, 100);
+}
+
+/**
+ * Export rekapitulasi ke CSV
+ */
+function exportLaporanCSV() {
+    if (!_laporanRawData) return;
+    const res = _laporanRawData;
+
+    let csvRows = [];
+    // Header row 1
+    let h1 = ['PERIHAL'];
+    res.bulan.forEach(b => { h1.push(b + ' SM'); h1.push(b + ' SACC'); });
+    h1.push('TOTAL SM'); h1.push('TOTAL SACC'); h1.push('RATE');
+    csvRows.push(h1.join(','));
+
+    // Data rows
+    res.kategori.forEach(k => {
+        let row = [k];
+        let totSM = 0, totSACC = 0;
+        for (let m = 0; m < 12; m++) {
+            row.push(res.data[k][m].tawaran);
+            row.push(res.data[k][m].diterima);
+            totSM   += res.data[k][m].tawaran;
+            totSACC += res.data[k][m].diterima;
+        }
+        const rate = totSM > 0 ? Math.round((totSACC / totSM) * 100) : 0;
+        row.push(totSM); row.push(totSACC); row.push(rate + '%');
+        csvRows.push(row.join(','));
+    });
+
+    // Grand total row
+    let gtRow = ['JUMLAH'];
+    for (let m = 0; m < 12; m++) {
+        let sm = 0, sacc = 0;
+        res.kategori.forEach(k => { sm += res.data[k][m].tawaran; sacc += res.data[k][m].diterima; });
+        gtRow.push(sm); gtRow.push(sacc);
+    }
+    const gt = res.grandTotal;
+    gtRow.push(gt.totalTawaran); gtRow.push(gt.totalDiterima); gtRow.push(gt.rate + '%');
+    csvRows.push(gtRow.join(','));
+
+    const csvContent = '\uFEFF' + csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url;
+    a.download = 'Rekap_Magang_' + (res.year || 'all') + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+
+    if (typeof showToast === 'function') showToast('success', 'Export Berhasil', 'File CSV berhasil diunduh.');
+}
+
+// ============================================================
+// ===== AUTO-TRIGGER LAPORAN WHEN PAGE BECOMES ACTIVE ========
+// ============================================================
+(function() {
+    function hookLaporanPage() {
+        const laporanPage = document.getElementById('page-laporan');
+        if (!laporanPage) return;
+
+        // MutationObserver: deteksi saat class 'active' ditambahkan ke page-laporan
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.attributeName === 'class') {
+                    const isActive = laporanPage.classList.contains('active');
+                    if (isActive && typeof loadLaporanRekap === 'function') {
+                        // Hanya load jika belum pernah load sebelumnya untuk sesi ini
+                        if (!window._laporanLoaded) {
+                            window._laporanLoaded = true;
+                            loadLaporanRekap();
+                        }
+                    }
+                    // Reset flag saat navigasi pergi
+                    if (!isActive) {
+                        window._laporanLoaded = false;
+                    }
+                }
+            });
+        });
+
+        observer.observe(laporanPage, { attributes: true });
+
+        // Juga hook nav-item click via event delegation (sebagai backup)
+        document.addEventListener('click', function(e) {
+            const navItem = e.target.closest('[data-page="laporan"]');
+            if (navItem && typeof loadLaporanRekap === 'function') {
+                setTimeout(function() {
+                    loadLaporanRekap();
+                }, 100);
+            }
+        });
+    }
+
+    // Jalankan setelah DOM siap
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', hookLaporanPage);
+    } else {
+        hookLaporanPage();
+    }
+})();
+
+/**
+ * [NEW] Mengambil daftar tahun dari server untuk sidebar laporan
+ */
+function loadLaporanYears() {
+    google.script.run
+        .withSuccessHandler(function (response) {
+            if (response.success && response.years) {
+                renderLaporanSidebar(response.years);
+            } else {
+                console.error('Gagal memuat tahun laporan:', response.message);
+            }
+        })
+        .getMagangYears();
+}
+
+/**
+ * [NEW] Merender daftar tahun ke dalam submenu sidebar
+ */
+function renderLaporanSidebar(years) {
+    const submenu = document.getElementById('submenu-laporan');
+    if (!submenu) return;
+    
+    if (years.length === 0) {
+        submenu.innerHTML = '<li class="submenu-item disabled" style="opacity: 0.5;">Tidak ada data</li>';
+        return;
+    }
+
+    submenu.innerHTML = years.map(year => `
+        <li class="submenu-item" onclick="navigateToYear(${year})">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: #667eea; opacity: 0.5;"></span>
+            Tahun ${year}
+        </li>
+    `).join('');
+}
+
+/**
+ * [NEW] Navigasi ke tahun tertentu di halaman laporan
+ */
+function navigateToYear(year) {
+    // 1. Berpindah ke halaman Laporan (Analytics)
+    navigateToPage('laporan');
+    
+    // 2. Isi input tahun di halaman laporan
+    const yearInput = document.getElementById('laporan-year-filter');
+    if (yearInput) {
+        yearInput.value = year;
+        
+        // 3. Trigger pemuatan data ulang untuk tahun tersebut
+        // Pastikan loadLaporanRekap dipanggil setelah halaman aktif
+        setTimeout(() => {
+            loadLaporanRekap();
+        }, 100);
+    }
+}
+</script>

@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Diklat - Management System</title>
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/id/d/de/Semen_Tonasa_logo.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <?!= include('styles'); ?>
+    <script>
+        window.onerror = function (message, source, lineno, colno, error) {
+            alert('Global Error: ' + message + '\nLine: ' + lineno + '\nSource: ' + source);
+            return false;
+        };
+
+        // Debug helper to check if function exists
+        window.addEventListener('load', function () {
+            if (typeof showAddMagangModal !== 'function') {
+                alert('CRITICAL ERROR: showAddMagangModal is NOT defined! The script may have crashed earlier.');
+            }
+        });
+    </script>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="3" width="7" height="7" rx="2" fill="url(#logo-gradient)" />
+                        <rect x="3" y="14" width="7" height="7" rx="2" fill="url(#logo-gradient)" opacity="0.6" />
+                        <rect x="14" y="3" width="7" height="7" rx="2" fill="url(#logo-gradient)" opacity="0.8" />
+                        <rect x="14" y="14" width="7" height="7" rx="2" fill="url(#logo-gradient)" opacity="0.4" />
+                        <defs>
+                            <linearGradient id="logo-gradient" x1="0" y1="0" x2="24" y2="24"
+                                gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="#667eea" />
+                                <stop offset="100%" stop-color="#764ba2" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <div class="logo-content">
+                    <h1 class="logo-text">DiklatHub</h1>
+                    <div class="logo-subtitle">MANAGEMENT SYSTEM</div>
+                </div>
+            </div>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleSidebar()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="12" x2="21" y2="12" />
+                    <line x1="3" y1="6" x2="21" y2="6" />
+                    <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <span class="nav-section-label">MENU UTAMA</span>
+                <div class="nav-item active" data-page="dashboard">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7" />
+                        <rect x="14" y="3" width="7" height="7" />
+                        <rect x="14" y="14" width="7" height="7" />
+                        <rect x="3" y="14" width="7" height="7" />
+                    </svg>
+                    <span class="nav-text">Dashboard</span>
+                </div>
+                <div class="nav-item" data-page="karyawan">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="8.5" cy="7" r="4" />
+                        <path d="M20 8v6M23 11h-6" />
+                    </svg>
+                    <span class="nav-text">Data Karyawan</span>
+                    <!-- Badge removed per user request -->
+                </div>
+                <div class="nav-item" data-page="magang">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                    <span class="nav-text">Data Magang</span>
+                    <!-- Badge removed per user request -->
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <span class="nav-section-label">LAPORAN</span>
+                <div class="nav-item" data-page="analytics">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <line x1="12" y1="20" x2="12" y2="10" />
+                        <line x1="18" y1="20" x2="18" y2="4" />
+                        <line x1="6" y1="20" x2="6" y2="16" />
+                    </svg>
+                    <span class="nav-text">Analytics</span>
+                </div>
+                <div class="nav-item has-submenu" id="nav-laporan-parent" onclick="toggleSubmenu('submenu-laporan'); navigateToPage('laporan');">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                        <polyline points="10 9 9 9 8 9" />
+                    </svg>
+                    <span class="nav-text">Laporan</span>
+                    <svg class="nav-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: auto;">
+                        <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                </div>
+                <ul class="submenu-list" id="submenu-laporan">
+                    <!-- Dinamis: Diisi melalui loadLaporanYears() di script.html -->
+                    <li class="submenu-item disabled" style="opacity: 0.5; cursor: default;">
+                        Memuat tahun...
+                    </li>
+                </ul>
+                <!-- ACTIVITY LOG MENU -->
+                <div class="nav-item" data-page="activity">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"></path>
+                    </svg>
+                    <span class="nav-text">Activity Log</span>
+                </div>
+            </div>
+        </nav>
+
+        <div class="sidebar-theme-toggle" onclick="toggleTheme()">
+            <div class="theme-toggle-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+            </div>
+            <span class="nav-text" style="flex: 1; margin-left: 12px; font-size: 14px; font-weight: 500;">Switch
+                Theme</span>
+        </div>
+
+        <div id="online-users-container" class="online-users-section"
+            style="padding: 15px 20px; border-top: 1px solid var(--border-color); display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span
+                    style="font-size: 11px; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.5px;">ONLINE
+                    USERS</span>
+                <span id="online-count-badge"
+                    style="font-size: 10px; background: #10b981; color: white; padding: 1px 5px; border-radius: 4px;">0</span>
+            </div>
+            <div id="online-avatars" style="display: flex; -space-x-2: -8px; overflow: hidden; padding-left: 5px;">
+                <!-- Avatars will be injected here -->
+                <div class="user-avatar-sm" style="width: 24px; height: 24px; font-size: 10px;">?</div>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-profile" onclick="toggleUserMenu()">
+                <!-- User Menu Popup -->
+                <div class="user-menu-popup" id="userMenuPopup" style="display: none;">
+                    <div class="user-menu-header">
+                        <div class="user-avatar-lg">A</div>
+                        <div class="user-info-lg">
+                            <strong class="user-name-display">Admin</strong>
+                            <span class="user-role-display">Administrator</span>
+                        </div>
+                    </div>
+                    <ul class="user-menu-items">
+                        <li onclick="showProfile()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            <span>Profil</span>
+                        </li>
+                        <li onclick="navigateToPage('pengaturan')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path
+                                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                                </path>
+                            </svg>
+                            <span>Pengaturan</span>
+                        </li>
+                        <li class="menu-divider"></li>
+                        <li class="color-danger" onclick="logout()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                <polyline points="16 17 21 12 16 7"></polyline>
+                                <line x1="21" y1="12" x2="9" y2="12"></line>
+                            </svg>
+                            <span>Keluar</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="user-avatar">A</div>
+                <div class="user-info">
+                    <div class="user-name">Admin</div>
+                    <div class="user-role">Administrator</div>
+                </div>
+                <button class="user-menu-toggle" id="userMenuToggle">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="18 15 12 9 6 15" class="arrow-up" style="display: none;" />
+                        <polyline points="6 9 12 15 18 9" class="arrow-down" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-wrapper">
+            <!-- Dashboard Content -->
+            <div class="page-content active" id="page-dashboard">
+                <div class="page-header">
+                    <h2>Dashboard Overview</h2>
+                    <div class="page-actions">
+                        <button class="icon-button">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="11" cy="11" r="8" />
+                                <path d="m21 21-4.35-4.35" />
+                            </svg>
+                        </button>
+                        <button class="icon-button">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Total Karyawan</h3>
+                            <p class="stat-number" id="stat-karyawan">0</p>
+                            <span class="stat-change positive" id="stat-karyawan-change">Loading...</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Peserta Magang</h3>
+                            <p class="stat-number" id="stat-magang">0</p>
+                            <span class="stat-change positive" id="stat-magang-change">Loading...</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Total Data</h3>
+                            <p class="stat-number" id="stat-total">0</p>
+                            <span class="stat-change neutral" id="stat-total-change">Loading...</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Status Sistem</h3>
+                            <p class="stat-number">100%</p>
+                            <span class="stat-change positive">Semua Berfungsi</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Widgets Section Removed per User Request -->
+                <!-- <div class="widgets-row"> ... </div> -->
+
+                <div class="dashboard-grid" style="margin-top: 24px;">
+                    <div class="activity-card">
+                        <div class="card-header">
+                            <h3>Aktivitas Terbaru</h3>
+                            <button class="icon-button">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <circle cx="12" cy="12" r="1" />
+                                    <circle cx="19" cy="12" r="1" />
+                                    <circle cx="5" cy="12" r="1" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="activity-list" id="activity-list">
+                            <p style="color: var(--text-secondary); text-align: center; padding: 20px;">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Karyawan Content -->
+            <div class="page-content" id="page-karyawan">
+                <div class="page-header">
+                    <h2>Data Karyawan</h2>
+                    <div class="page-actions">
+                        <button class="btn-secondary" onclick="exportDataCSV('Data Karyawan')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            Export CSV
+                        </button>
+                        <button class="btn-secondary" onclick="exportDataPDF()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                                <line x1="16" y1="13" x2="8" y2="13" />
+                                <line x1="16" y1="17" x2="8" y2="17" />
+                            </svg>
+                            Export PDF
+                        </button>
+                        <button class="btn-primary" onclick="showAddKaryawanModal()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" y1="8" x2="12" y2="16" />
+                                <line x1="8" y1="12" x2="16" y2="12" />
+                            </svg>
+                            Tambah Karyawan
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="stats-grid" style="margin-bottom: 24px;">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Total Karyawan</h3>
+                            <p class="stat-number" id="total-karyawan">0</p>
+                            <span class="stat-change neutral" id="total-karyawan-label">Loading...</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <span style="font-size: 28px;">👨</span>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Laki-laki</h3>
+                            <p class="stat-number" id="total-laki">0</p>
+                            <span class="stat-change neutral" id="total-laki-label">Loading...</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <span style="font-size: 28px;">👩</span>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Perempuan</h3>
+                            <p class="stat-number" id="total-perempuan">0</p>
+                            <span class="stat-change neutral" id="total-perempuan-label">Loading...</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" />
+                                <line x1="3" y1="9" x2="21" y2="9" />
+                                <line x1="9" y1="21" x2="9" y2="9" />
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Departemen</h3>
+                            <p class="stat-number" id="total-departemen">0</p>
+                            <span class="stat-change neutral" id="total-departemen-label">Loading...</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                                <polyline points="9 22 9 12 15 12 15 22" />
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Unit/Biro</h3>
+                            <p class="stat-number" id="total-biro">0</p>
+                            <span class="stat-change neutral" id="total-biro-label">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search and Filters -->
+                <div class="page-actions" style="margin-bottom: 16px;">
+                    <div class="search-box">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="m21 21-4.35-4.35" />
+                        </svg>
+                        <input type="text" id="search-karyawan" placeholder="Cari karyawan...">
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="color: var(--text-secondary); font-size: 14px;">Tampilkan:</span>
+                        <select class="form-control" id="rows-per-page" style="width: auto; min-width: 100px;">
+                            <option value="50">50 data</option>
+                            <option value="100">100 data</option>
+                            <option value="all">Semua</option>
+                        </select>
+                        <span id="pagination-info"
+                            style="color: var(--text-secondary); font-size: 14px; margin-left: 8px;">Menampilkan 0 dari
+                            0 data</span>
+                    </div>
+                </div>
+
+                <div class="filter-row" style="display: flex; gap: 12px; margin-bottom: 24px;">
+                    <select class="form-control" id="filter-gender" style="flex: 1;">
+                        <option value="">Semua Gender</option>
+                        <option value="M">Male</option>
+                        <option value="F">Female</option>
+                    </select>
+                    <select class="form-control" id="filter-directorate" style="flex: 1;">
+                        <option value="">Semua Directorate</option>
+                    </select>
+                    <select class="form-control" id="filter-departemen" style="flex: 1;">
+                        <option value="">Semua Departemen</option>
+                    </select>
+                    <select class="form-control" id="filter-biro" style="flex: 1;">
+                        <option value="">Semua Biro</option>
+                    </select>
+                    <button class="btn-secondary" onclick="resetKaryawanFilters()" style="white-space: nowrap;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="1 4 1 10 7 10" />
+                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                        </svg>
+                        Reset Filter
+                    </button>
+                </div>
+
+                <div class="data-table-container">
+                    <div id="karyawan-loading" class="loading-state">
+                        <p>Memuat data karyawan...</p>
+                    </div>
+                    <div id="karyawan-table-wrapper" style="display: none;">
+                        <table class="data-table" id="karyawan-table">
+                            <thead id="karyawan-table-head"></thead>
+                            <tbody id="karyawan-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Magang Content -->
+            <div class="page-content" id="page-magang">
+                <!-- BATCH VIEW (Initial View) -->
+                <div id="magang-batch-view">
+                    <div class="page-header">
+                        <h2>Data Magang - Pilih Periode</h2>
+                        <div class="page-actions">
+                            <button class="btn-primary" onclick="showCreateBatchModal()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                Buat Batch Baru
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="batch-grid" class="batch-grid">
+                        <div class="loading-state">
+                            <p>Memuat daftar batch...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LIST VIEW (Hidden by default) -->
+                <div id="magang-list-view" style="display: none;">
+                    <div class="page-header">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <button class="icon-button" onclick="showBatchView()" title="Kembali ke Daftar Batch"
+                                style="background:none; border:none; padding:0;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                                </svg>
+                            </button>
+                            <h2 id="magang-batch-title">Data Magang</h2>
+                        </div>
+                        <div class="page-actions">
+                            <div style="display: flex; gap: 8px; margin-right: 12px;">
+                                <button class="btn-sm btn-primary" id="filter-btn-all"
+                                    onclick="filterMagangStatus('all')"
+                                    style="font-size: 13px; padding: 6px 12px;">Semua</button>
+                                <button class="btn-sm btn-secondary" id="filter-btn-active"
+                                    onclick="filterMagangStatus('active')"
+                                    style="font-size: 13px; padding: 6px 12px;">Aktif</button>
+                                <button class="btn-sm btn-secondary" id="filter-btn-finished"
+                                    onclick="filterMagangStatus('finished')"
+                                    style="font-size: 13px; padding: 6px 12px;">Selesai</button>
+                            </div>
+
+                            <!-- EXPORT SURAT BALASAN BUTTON -->
+                            <button class="btn-secondary" onclick="showExportSuratBalasanModal()"
+                                style="margin-right: 12px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10 9 9 9 8 9"></polyline>
+                                </svg>
+                                Export Surat Balasan
+                            </button>
+
+                            <!-- EXPORT SURAT PENGANTAR BUTTON -->
+                            <button class="btn-secondary" onclick="showExportSuratPengantarModal()"
+                                style="margin-right: 12px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10 9 9 9 8 9"></polyline>
+                                </svg>
+                                Export Surat Pengantar
+                            </button>
+
+                            <!-- EXPORT SURAT PENOLAKAN BUTTON -->
+                            <button class="btn-secondary" onclick="showExportSuratPenolakanModal()"
+                                style="margin-right: 12px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <line x1="9" y1="15" x2="15" y2="9"></line>
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                </svg>
+                                Export Surat Penolakan
+                            </button>
+
+                            <div class="search-box">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <circle cx="11" cy="11" r="8" />
+                                    <path d="m21 21-4.35-4.35" />
+                                </svg>
+                                <input type="text" id="search-magang" placeholder="Cari magang...">
+                            </div>
+
+
+
+
+
+                            <div>
+                                <button class="btn-primary" onclick="showAddMagangModal()">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <circle cx="12" cy="12" r="10" />
+                                        <line x1="12" y1="8" x2="12" y2="16" />
+                                        <line x1="8" y1="12" x2="16" y2="12" />
+                                    </svg>
+                                    Tambah Magang
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filter-row" id="magang-advanced-filters"
+                        style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center;">
+
+
+
+                        <!-- Filters -->
+                        <select id="filter-magang-nosurat" class="form-control"
+                            style="width: auto; min-width: 180px; height: 38px;" onchange="applyMagangFilters()">
+                            <option value="">Semua Nomor Surat</option>
+                        </select>
+
+                        <select id="filter-magang-universitas" class="form-control"
+                            style="width: auto; min-width: 160px; height: 38px;" onchange="applyMagangFilters()">
+                            <option value="">Semua Universitas</option>
+                        </select>
+
+                        <select id="filter-magang-unit" class="form-control"
+                            style="width: auto; min-width: 160px; height: 38px;" onchange="applyMagangFilters()">
+                            <option value="">Semua Unit Kerja</option>
+                        </select>
+
+                        <select id="filter-magang-status" class="form-control"
+                            style="width: auto; min-width: 160px; height: 38px;" onchange="applyMagangFilters()">
+                            <option value="">Semua Status</option>
+                        </select>
+
+                        <select id="filter-magang-kehadiran" class="form-control"
+                            style="width: auto; min-width: 160px; height: 38px;" onchange="applyMagangFilters()">
+                            <option value="">Semua Kehadiran</option>
+                        </select>
+
+                        <select id="filter-magang-jenis" class="form-control"
+                            style="width: auto; min-width: 160px; height: 38px;" onchange="applyMagangFilters()">
+                            <option value="">Semua Jenis Pengajuan</option>
+                            <option value="PKL">PKL</option>
+                            <option value="Penelitian">Penelitian</option>
+                            <option value="Magang">Magang</option>
+                        </select>
+
+
+                        <select id="filter-magang-rekomendasi" class="form-control"
+                            style="width: auto; min-width: 180px; height: 38px;" onchange="applyMagangFilters()">
+                            <option value="">Semua Rekomendasi</option>
+                        </select>
+
+                        <!-- Reset Filter -->
+                        <button class="btn-secondary" onclick="resetMagangFilters()"
+                            style="height: 38px; display: flex; align-items: center; gap: 6px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 12" />
+                            </svg>
+                            Reset
+                        </button>
+                    </div>
+                    <!-- Unit Filter Container for backward compatibility -->
+                    <div id="magang-unit-filter-container" style="display: none;"></div>
+
+                    <div class="data-table-container">
+                        <div id="magang-loading" class="loading-state">
+                            <p>Memuat data magang...</p>
+                        </div>
+                        <div id="magang-table-wrapper" style="display: none;">
+                            <table class="data-table" id="magang-table">
+                                <thead id="magang-table-head"></thead>
+                                <tbody id="magang-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Content -->
+            <!-- Analytics Content -->
+            <div class="page-content" id="page-analytics">
+                <div class="page-header"
+                    style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <h2>Analytics DiklatHub</h2>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="number" id="analytics-year-filter" class="form-control"
+                            placeholder="Tahun (e.g. 2026)" style="width: 120px;" onchange="loadAnalyticsData()">
+
+                        <button class="btn-secondary" onclick="exportAnalyticsToPDF()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Download Report
+                        </button>
+
+                        <button class="btn-primary" onclick="loadAnalyticsData()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38" />
+                            </svg>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI Stats Grid -->
+                <div class="stats-grid"
+                    style="margin-bottom: 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                    <!-- Total All Time -->
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: #e0e7ff; color: #4f46e5;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="kpi-total">Loading...</h3>
+                            <p>Total Peserta</p>
+                        </div>
+                    </div>
+
+                    <!-- Active Participants -->
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: #d1fae5; color: #10b981;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="kpi-active">Loading...</h3>
+                            <p>Peserta Aktif</p>
+                        </div>
+                    </div>
+
+                    <!-- Mitra Kampus -->
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: #fef3c7; color: #d97706;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M3 21h18" />
+                                <path d="M5 21V7l8-4 8 4v14" />
+                                <path d="M9 10a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2" />
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="kpi-univ">Loading...</h3>
+                            <p>Total Mitra Kampus</p>
+                        </div>
+                    </div>
+
+                    <!-- Placeholder Avg Duration or Other -->
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: #f3e8ff; color: #9333ea;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <h3>~3 Bulan</h3>
+                            <p>Rata-rata Durasi</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="analytics-charts-area" class="analytics-grid"
+                    style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; padding-bottom: 40px;">
+                    <!-- Line Chart: Trend -->
+                    <div class="card" style="grid-column: 1 / -1;">
+                        <div class="card-header">
+                            <h3>Tren Jumlah Peserta Magang</h3>
+                        </div>
+                        <div style="height: 300px;">
+                            <canvas id="chart-trend"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Pie Chart: Universitas -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Distribusi Universitas Top 5</h3>
+                        </div>
+                        <div style="height: 300px; display: flex; justify-content: center;">
+                            <canvas id="chart-university"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Bar Chart: Jurusan -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Distribusi Jurusan Populer</h3>
+                        </div>
+                        <div style="height: 300px;">
+                            <canvas id="chart-major"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- NEW: Bar Chart: Unit Kerja -->
+                    <div class="card" style="grid-column: 1 / -1;">
+                        <div class="card-header">
+                            <h3>Distribusi Penempatan Unit Kerja</h3>
+                        </div>
+                        <div style="height: 300px;">
+                            <canvas id="chart-unit"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Laporan Content -->
+            <div class="page-content" id="page-laporan">
+                <!-- Header -->
+                <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <h2 style="margin-bottom:4px;">📊 Rekap Data Magang</h2>
+                        <p style="color:var(--text-secondary);font-size:14px;">Over Acceptance Rate — Jumlah Penawaran yang Masuk vs Diterima</p>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="number" id="laporan-year-filter" class="form-control"
+                            placeholder="Tahun (e.g. 2026)" style="width: 160px;"
+                            onchange="loadLaporanRekap()">
+                        <button class="btn-secondary" onclick="exportLaporanCSV()" id="btn-export-laporan" style="display:none;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Export CSV
+                        </button>
+                        <button class="btn-primary" onclick="loadLaporanRekap()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38" />
+                            </svg>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div id="laporan-loading" class="loading-state" style="padding:60px 20px; text-align:center;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5" style="margin:0 auto 12px; display:block; animation: spin 1s linear infinite;">
+                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38"/>
+                    </svg>
+                    <p style="color:var(--text-secondary);">Memuat rekap data magang...</p>
+                </div>
+
+                <!-- Content (hidden until loaded) -->
+                <div id="laporan-content" style="display:none;">
+
+                    <!-- KPI Summary Cards -->
+                    <div id="laporan-summary-cards" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:24px;"></div>
+
+                    <!-- Grand Total Banner -->
+                    <div id="laporan-grand-total" style="margin-bottom:24px; border-radius:16px; padding:20px 28px; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                        <div>
+                            <div style="font-size:13px; opacity:.8; font-weight:600; letter-spacing:.5px; text-transform:uppercase;">Grand Total Keseluruhan</div>
+                            <div id="laporan-grand-label" style="font-size:28px; font-weight:800; margin-top:4px;">-</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-size:13px; opacity:.8;">Overall Acceptance Rate</div>
+                            <div id="laporan-grand-rate" style="font-size:40px; font-weight:900; margin-top:2px;">-%</div>
+                        </div>
+                    </div>
+
+                    <!-- Chart -->
+                    <div class="card" style="margin-bottom:24px;">
+                        <div class="card-header">
+                            <h3>📈 Grafik Tawaran vs Diterima per Bulan</h3>
+                            <div style="display:flex; gap:8px;">
+                                <button class="btn-secondary" style="font-size:12px; padding:6px 12px;" onclick="switchLaporanChart('all')">Semua</button>
+                                <button class="btn-secondary" style="font-size:12px; padding:6px 12px;" onclick="switchLaporanChart('Magang')">Magang</button>
+                                <button class="btn-secondary" style="font-size:12px; padding:6px 12px;" onclick="switchLaporanChart('PKL')">PKL</button>
+                                <button class="btn-secondary" style="font-size:12px; padding:6px 12px;" onclick="switchLaporanChart('KKN Profesi')">KKN</button>
+                                <button class="btn-secondary" style="font-size:12px; padding:6px 12px;" onclick="switchLaporanChart('Penelitian')">Penelitian</button>
+                            </div>
+                        </div>
+                        <div style="height:320px;">
+                            <canvas id="chart-laporan-rekap"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Tabel Utama: Format Over Acceptance Rate -->
+                    <div class="card" style="margin-bottom:24px;">
+                        <div class="card-header">
+                            <h3>📋 Tabel Rekapitulasi Bulanan</h3>
+                            <span style="font-size:12px; color:var(--text-secondary);">SM = Surat Masuk (Tawaran) &nbsp;|&nbsp; SACC = Surat Diterima</span>
+                        </div>
+                        <div style="overflow-x:auto;">
+                            <table id="laporan-main-table" class="data-table" style="min-width:1100px; font-size:12px;">
+                                <thead id="laporan-main-thead"></thead>
+                                <tbody id="laporan-main-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Acceptance Rate per Kategori (Bar mini) -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>🎯 Acceptance Rate per Kategori</h3>
+                        </div>
+                        <div id="laporan-rate-bars" style="padding:8px 0;"></div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Activity Log Content -->
+            <div class="page-content" id="page-activity">
+                <div class="page-header">
+                    <h2>Activity Log</h2>
+                    <div class="page-actions">
+                        <button class="btn-secondary" onclick="showDeleteLogOptions()"
+                            style="color: #ef4444; border-color: #ef4444;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path
+                                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                </path>
+                            </svg>
+                            Hapus Log
+                        </button>
+                        <button class="btn-primary" onclick="loadActivityLogPage()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38" />
+                            </svg>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div class="filter-row" style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <label
+                            style="font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block;">User</label>
+                        <select class="form-control" id="filter-log-user" onchange="applyLogFilters()">
+                            <option value="">Semua User</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <label
+                            style="font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block;">Tipe
+                            Aksi</label>
+                        <select class="form-control" id="filter-log-action" onchange="applyLogFilters()">
+                            <option value="">Semua Aksi</option>
+                            <option value="Mengedit">Edit</option>
+                            <option value="Menambahkan">Tambah</option>
+                            <option value="Menghapus">Hapus</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <label
+                            style="font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block;">Tanggal</label>
+                        <input type="date" class="form-control" id="filter-log-date" onchange="applyLogFilters()">
+                    </div>
+                    <button class="btn-secondary" onclick="resetLogFilters()"
+                        style="align-self: flex-end; height: 38px;">
+                        Reset
+                    </button>
+                </div>
+
+                <div class="data-table-container">
+                    <div id="log-loading" class="loading-state">
+                        <p>Memuat log aktivitas...</p>
+                    </div>
+                    <div id="log-table-wrapper" style="display: none;">
+                        <table class="data-table" id="log-table">
+                            <thead>
+                                <tr>
+                                    <th>Waktu</th>
+                                    <th>User</th>
+                                    <th>Aksi</th>
+                                    <th>Subjek</th>
+                                    <th>Detail Perubahan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="log-table-body"></tbody>
+                        </table>
+                        <div id="log-pagination" style="margin-top: 16px; text-align: center; display: none;">
+                            <button class="btn-sm btn-secondary" id="btn-load-more-logs" onclick="loadMoreLogs()">Load
+                                More</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pengaturan Content -->
+            <div class="page-content" id="page-pengaturan">
+                <div class="page-header">
+                    <h2>Pengaturan</h2>
+                </div>
+                <p style="color: var(--text-secondary);">Halaman pengaturan dalam pengembangan...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Container -->
+    <div id="modal-container"></div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- jsPDF Library for PDF Export -->
+    <!-- jsPDF Library for PDF Export -->
+    <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js" defer crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/jspdf-autotable@3.5.31/dist/jspdf.plugin.autotable.min.js" defer
+        crossorigin="anonymous"></script>
+    <!-- Chart.js for Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <div id="auth-overlay" class="auth-overlay" style="display: none;">
+        <div class="auth-box glass-panel"
+            style="display: flex; flex-direction: row; padding: 0; overflow: hidden; width: 100%; max-width: 900px; min-height: 500px; background: var(--bg-secondary);">
+
+            <!-- Left Side: Image -->
+            <div class="auth-banner"
+                style="flex: 1; background-image: url('https://i.imgur.com/Gpvr0Cc.png'); background-size: cover; background-position: center; position: relative; min-height: 200px;">
+                <div
+                    style="position: absolute; top:0; left:0; right:0; bottom:0; background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6));">
+                </div>
+            </div>
+
+            <!-- Right Side: Form -->
+            <div class="auth-form-side"
+                style="flex: 1; padding: 48px; display: flex; flex-direction: column; justify-content: center;">
+
+                <div class="auth-header" style="text-align: left; margin-bottom: 32px;">
+                    <h2 style="font-size: 28px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">
+                        Selamat Datang</h2>
+                    <p style="color: var(--text-secondary); font-size: 15px;">Silakan login untuk melanjutkan</p>
+                </div>
+
+                <div id="login-form-container">
+                    <div class="form-group">
+                        <label
+                            style="display:block; margin-bottom:8px; font-weight:600; font-size:14px; color:var(--text-primary);">Email</label>
+                        <input type="email" id="login-email" class="form-control" placeholder="email@tonasa.sig.id"
+                            style="width:100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-tertiary);">
+                    </div>
+
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label
+                            style="display:block; margin-bottom:8px; font-weight:600; font-size:14px; color:var(--text-primary);">Password</label>
+                        <input type="password" id="login-password" class="form-control" placeholder="••••••••"
+                            style="width:100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-tertiary);">
+                        <div id="login-error-msg" class="auth-error-msg"
+                            style="color: #ef4444; font-size: 13px; margin-top: 8px; display: none;"></div>
+                    </div>
+
+                    <div style="margin-top: 32px;">
+                        <button class="btn-primary" id="btn-login"
+                            onclick="handleLogin(document.getElementById('login-email').value, document.getElementById('login-password').value)"
+                            style="width: 100%; justify-content: center; padding: 12px; font-size: 16px;">
+                            Masuk
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <style>
+                @media (max-width: 768px) {
+                    .auth-box {
+                        flex-direction: column !important;
+                        max-width: 90% !important;
+                    }
+
+                    .auth-banner {
+                        display: none !important;
+                    }
+                }
+            </style>
+        </div>
+
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <?!= include('script'); ?>
+
+
+        <!-- Mobile Bottom Navigation (Floating Island Style) -->
+        <!-- Mobile Bottom Navigation (Floating Island Style) -->
+        <div class="mobile-bottom-nav">
+            <!-- Dashboard -->
+            <div class="mobile-nav-item active" data-page="dashboard">
+                <div class="mobile-nav-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1a1f2e" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                </div>
+                <span class="nav-text-label">Home</span>
+            </div>
+
+            <!-- Karyawan -->
+            <div class="mobile-nav-item" data-page="karyawan">
+                <div class="mobile-nav-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                </div>
+                <span class="nav-text-label">Data</span>
+            </div>
+
+            <!-- Magang -->
+            <div class="mobile-nav-item" data-page="magang">
+                <div class="mobile-nav-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                </div>
+                <span class="nav-text-label">Mgg</span>
+            </div>
+
+            <!-- Laporan -->
+            <div class="mobile-nav-item" data-page="laporan">
+                <div class="mobile-nav-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2">
+                        <circle cx="12" cy="12" r="1"></circle>
+                        <circle cx="19" cy="12" r="1"></circle>
+                        <circle cx="5" cy="12" r="1"></circle>
+                    </svg>
+                </div>
+                <span class="nav-text-label">Menu</span>
+            </div>
+        </div>
+
+        <style>
+            /* CRITICAL MOBILE NAV STYLES (INJECTED & NUCLEAR) */
+            .mobile-bottom-nav {
+                display: flex !important;
+                position: fixed;
+                bottom: 24px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 90%;
+                max-width: 400px;
+                background: #1e1e1e !important;
+                /* Solid dark */
+                border-radius: 50px;
+                padding: 10px 20px;
+                justify-content: space-between;
+                align-items: center;
+                z-index: 99999;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .mobile-nav-item {
+                display: flex;
+                flex-direction: column;
+                /* Stack icon and text */
+                align-items: center;
+                justify-content: center;
+                padding: 8px;
+                border-radius: 12px;
+                transition: all 0.3s ease;
+                cursor: pointer;
+                width: 60px;
+                /* Force width */
+            }
+
+            .mobile-nav-icon svg {
+                width: 24px;
+                height: 24px;
+                display: block;
+                stroke-width: 2px;
+            }
+
+            .nav-text-label {
+                font-size: 10px;
+                color: rgba(255, 255, 255, 0.6);
+                margin-top: 4px;
+                display: block;
+            }
+
+            /* Active State logic */
+            .mobile-nav-item.active {
+                background: white !important;
+                border-radius: 50%;
+                width: 48px;
+                height: 48px;
+                padding: 0;
+                transform: translateY(-5px);
+                box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+            }
+
+            .mobile-nav-item.active .nav-text-label {
+                display: none !important;
+                /* Hide text on active to maintain circle shape */
+            }
+
+            .mobile-nav-item.active .mobile-nav-icon svg {
+                stroke: #1a1f2e !important;
+                /* Force dark stroke on active */
+            }
+
+            .mobile-nav-item.active .mobile-nav-icon svg {
+                stroke: #1a1f2e !important;
+                /* Force dark stroke on active */
+            }
+
+            /* Desktop Hide - ENABLED */
+            @media (min-width: 769px) {
+                .mobile-bottom-nav {
+                    display: none !important;
+                }
+            }
+
+            /* Hide on Auth Screens (Login/Register) */
+            body.auth-mode .mobile-bottom-nav {
+                display: none !important;
+            }
+        </style>
+</body>
+
+</html>
